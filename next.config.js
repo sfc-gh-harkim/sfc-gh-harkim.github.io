@@ -4,8 +4,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: '/sfc-gh-harkim.github.io',
-  assetPrefix: '/sfc-gh-harkim.github.io',
+  // The following are needed for GitHub Pages
+  basePath: process.env.NODE_ENV === 'production' ? '/sfc-gh-harkim.github.io' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/sfc-gh-harkim.github.io/' : '',
+  trailingSlash: true,
 };
 
 module.exports = nextConfig; 
