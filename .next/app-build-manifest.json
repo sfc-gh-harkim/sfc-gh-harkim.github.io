@@ -1,3 +1,42 @@
 {
-  "pages": {}
+  "pages": {
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/loading-states/ai-input-loader/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/loading-states/ai-input-loader/page.css",
+      "static/chunks/app/loading-states/ai-input-loader/page.js"
+    ],
+    "/loading-states/multi-ai-input-loader/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/loading-states/multi-ai-input-loader/page.css",
+      "static/chunks/app/loading-states/multi-ai-input-loader/page.js"
+    ],
+    "/avatar/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/avatar/page.js"
+    ],
+    "/avatar/states/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/avatar/states/page.js"
+    ],
+    "/loading-states/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/loading-states/page.js"
+    ]
+  }
 }

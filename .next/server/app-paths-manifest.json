@@ -1,1 +1,9 @@
-{}
+{
+  "/page": "app/page.js",
+  "/loading-states/page": "app/loading-states/page.js",
+  "/avatar/page": "app/avatar/page.js",
+  "/loading-states/multi-ai-input-loader/page": "app/loading-states/multi-ai-input-loader/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/loading-states/ai-input-loader/page": "app/loading-states/ai-input-loader/page.js",
+  "/avatar/states/page": "app/avatar/states/page.js"
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "./styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   robots: {
     index: false,
     follow: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 
