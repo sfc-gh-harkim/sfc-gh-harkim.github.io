@@ -18,7 +18,8 @@ const sidebarItems: SidebarItem[] = [
     title: 'Loading States',
     href: '/loading-states',
     children: [
-      { title: 'AI Input Loader', href: '/loading-states/ai-input-loader' },
+      { title: 'AI Input Loader (Looping)', href: '/loading-states/ai-input-loader-looping' },
+      { title: 'AI Input Loader (Shimmer)', href: '/loading-states/ai-input-loader-shimmer' },
       { title: 'Multi AI Input Loader', href: '/loading-states/multi-ai-input-loader' },
     ],
   },
@@ -33,6 +34,13 @@ const sidebarItems: SidebarItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  
+  // Normalize paths by removing trailing slashes except for root
+  const normalizePath = (path: string) => {
+    return path === '/' ? path : path.replace(/\/$/, '');
+  };
+  
+  const normalizedPathname = normalizePath(pathname);
 
   return (
     <aside className="w-64 bg-gray-800 h-screen fixed left-0 top-0 overflow-y-auto">
@@ -45,11 +53,11 @@ export function Sidebar() {
             <div key={item.href} className="space-y-2">
               <Link
                 href={item.href}
-                className={`block text-sm font-medium ${
-                  pathname === item.href
-                    ? 'text-blue-400'
-                    : 'text-gray-300 hover:text-gray-100'
-                }`}
+                className={
+                  normalizedPathname === normalizePath(item.href)
+                    ? "block text-sm text-white font-bold"
+                    : "block text-sm text-gray-300 hover:text-gray-100"
+                }
               >
                 {item.title}
               </Link>
@@ -59,11 +67,11 @@ export function Sidebar() {
                     <Link
                       key={child.href}
                       href={child.href}
-                      className={`block text-sm ${
-                        pathname === child.href
-                          ? 'text-blue-400'
-                          : 'text-gray-400 hover:text-gray-300'
-                      }`}
+                      className={
+                        normalizedPathname === normalizePath(child.href)
+                          ? "block text-sm text-white font-bold"
+                          : "block text-sm text-gray-400 hover:text-gray-300"
+                      }
                     >
                       {child.title}
                     </Link>

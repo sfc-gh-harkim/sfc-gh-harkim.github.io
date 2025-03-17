@@ -3,13 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AIInputLoader.module.css';
 
-interface AIInputLoaderProps {
+interface BaseAIInputLoaderProps {
     onThinkingComplete?: () => void;
     width?: number;
     height?: number;
     isTriggered?: boolean;
     hideButton?: boolean;
     startDelay?: number;
+    variant: 'looping' | 'shimmer';
 }
 
 const placeholderSequence = [
@@ -20,13 +21,14 @@ const placeholderSequence = [
 
 const FINAL_TEXT = "Size of wheels being placed on bikes within the store inventory";
 
-export const AIInputLoader: React.FC<AIInputLoaderProps> = ({
+export const BaseAIInputLoader: React.FC<BaseAIInputLoaderProps> = ({
     onThinkingComplete,
     width = 440,
     height = 120,
     isTriggered = false,
     hideButton = false,
-    startDelay = 0
+    startDelay = 0,
+    variant
 }) => {
     const [isThinking, setIsThinking] = useState(false);
     const [isDone, setIsDone] = useState(false);
@@ -124,44 +126,55 @@ export const AIInputLoader: React.FC<AIInputLoaderProps> = ({
                     readOnly
                     style={{ width, height, resize: 'none' }}
                 />
-                <svg
-                    className={`${styles.thinkingOutline} ${isThinking ? styles.thinking : ''} ${isDone ? styles.done : ''}`}
-                    width={width}
-                    height={height}
-                >
-                    <defs>
-                        <linearGradient id="loading-gradient" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90)">
-                            <stop offset="0%" stopColor="#2986E8" stopOpacity="1" />
-                            <stop offset="50%" stopColor="#2986E8" stopOpacity="1" />
-                            <stop offset="100%" stopColor="#2986E8" stopOpacity="0" />
-                        </linearGradient>
-                        <linearGradient id="completed-gradient" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stopColor="#2986E8" />
-                            <stop offset="50%" stopColor="#90E0FD" />
-                            <stop offset="75%" stopColor="#11C5CF" />
-                            <stop offset="100%" stopColor="#2986E8" />
-                        </linearGradient>
-                    </defs>
-                    <rect
-                        className={styles.outlinePath}
+                {variant === 'looping' && (
+                    <svg
+                        className={`${styles.thinkingOutline} ${isThinking ? styles.thinking : ''} ${isDone ? styles.done : ''}`}
                         width={width}
                         height={height}
-                        rx="6"
-                        ry="6"
-                    />
-                    <rect
-                        className={styles.gradientPath}
-                        width={width}
-                        height={height}
-                        rx="6"
-                        ry="6"
-                    />
-                </svg>
+                    >
+                        <defs>
+                            <linearGradient id="loading-gradient" gradientUnits="userSpaceOnUse" gradientTransform="rotate(90)">
+                                <stop offset="0%" stopColor="#2986E8" stopOpacity="1" />
+                                <stop offset="50%" stopColor="#2986E8" stopOpacity="1" />
+                                <stop offset="100%" stopColor="#2986E8" stopOpacity="0" />
+                            </linearGradient>
+                            <linearGradient id="completed-gradient" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stopColor="#2986E8" />
+                                <stop offset="50%" stopColor="#90E0FD" />
+                                <stop offset="75%" stopColor="#11C5CF" />
+                                <stop offset="100%" stopColor="#2986E8" />
+                            </linearGradient>
+                        </defs>
+                        <rect
+                            className={styles.outlinePath}
+                            width={width}
+                            height={height}
+                            rx="6"
+                            ry="6"
+                        />
+                        <rect
+                            className={styles.gradientPath}
+                            width={width}
+                            height={height}
+                            rx="6"
+                            ry="6"
+                        />
+                    </svg>
+                )}
+                {variant === 'shimmer' && (
+                    <div 
+                        className={styles.skeletonContainer}
+                        style={{ opacity: isThinking && !isDone ? 1 : 0, transition: 'opacity 0.3s ease' }}
+                    >
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                    </div>
+                )}
             </div>
             {!hideButton && (
                 <div className={styles.buttonContainer}>
                     <a
-                        href="https://snowflake.design-lab.app/loading-states/ai-input-loader"
+                        href={`/loading-states/ai-input-loader/in-situ?variant=${variant}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.viewButton}
@@ -188,6 +201,4 @@ export const AIInputLoader: React.FC<AIInputLoaderProps> = ({
             )}
         </div>
     );
-};
-
-export default AIInputLoader; 
+}; 

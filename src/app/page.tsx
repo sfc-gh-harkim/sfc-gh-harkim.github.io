@@ -10,7 +10,7 @@ export default function Home() {
     <ProjectPageTemplate>
       <PageHeader
         title="Design Lab"
-        description="A collection of beautiful, reusable React components built with Next.js and Tailwind CSS."
+        description="Harold's personal sandbox at Snowflake Design. All examples are built in Next.js and either Tailwind CSS or Balto."
         centered
         className="mb-8"
       />

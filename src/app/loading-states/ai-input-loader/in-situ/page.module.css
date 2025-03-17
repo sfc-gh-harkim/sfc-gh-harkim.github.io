@@ -1,0 +1,89 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #111827;
+}
+
+.backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #111827;
+}
+
+.backdropImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.95;
+}
+
+.modal {
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    background: #1E252F;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.30);
+    width: max-content;
+}
+
+.modal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.modalContent {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: -8px;
+}
+
+.cancelButton, .saveButton {
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton {
+    background: transparent;
+    border: none;
+    color: #BDC4D5;
+}
+
+.cancelButton:hover {
+    color: #ffffff;
+}
+
+.saveButton {
+    background: #2986E8;
+    border: none;
+    color: #ffffff;
+}
+
+.saveButton:hover {
+    background: #2476D1;
+} 
