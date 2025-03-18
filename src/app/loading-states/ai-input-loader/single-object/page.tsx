@@ -1,18 +1,24 @@
 'use client';
 
 import { BaseAIInputLoader } from '../BaseAIInputLoader';
-import styles from './page.module.css';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function SingleObjectPage() {
+function SingleObjectContent() {
     const searchParams = useSearchParams();
     const variant = searchParams.get('variant') as 'looping' | 'shimmer' || 'looping';
-
+    
     return (
-        <div className={styles.container}>
-            <div className={styles.modal}>
-                <BaseAIInputLoader variant={variant} hideButton />
-            </div>
+        <div style={{ padding: '2rem' }}>
+            <BaseAIInputLoader variant={variant} />
         </div>
+    );
+}
+
+export default function SingleObjectPage() {
+    return (
+        <Suspense>
+            <SingleObjectContent />
+        </Suspense>
     );
 } 

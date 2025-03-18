@@ -3,13 +3,13 @@
 import { BaseAIInputLoader } from '../BaseAIInputLoader';
 import styles from '../staged/snowflake.module.css';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 
 type ExpandedItems = {
     [key: string]: boolean;
 };
 
-export default function SingleColPage() {
+function SingleColContent() {
     const searchParams = useSearchParams();
     const variant = searchParams.get('variant') as 'looping' | 'shimmer' || 'looping';
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -371,5 +371,13 @@ export default function SingleColPage() {
                 </div>
             </div>
         </>
+    );
+}
+
+export default function SingleColPage() {
+    return (
+        <Suspense>
+            <SingleColContent />
+        </Suspense>
     );
 } 
