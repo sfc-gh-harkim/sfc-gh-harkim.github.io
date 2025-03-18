@@ -49,18 +49,19 @@
     color: #ffffff;
 }
 
+/* Default state - initial text area */
 .styledInput {
     width: 440px;
     padding: 24px;
-    padding-top: 52px;  /* Original 24px + 20px (14px font + 8px gap) */
+    padding-top: 52px;
     font-size: 14px;
     line-height: 20px;
-    border: 1px solid #165167;
+    border: 1px solid #293246;
     border-radius: 6px;
-    transition: all 0.3s ease;
+    background-color: #1f2937;
+    transition: all 0.1s ease;
     outline: none;
     position: relative;
-    background-color: #1f2937;
     color: #f3f4f6;
     box-sizing: border-box;
     height: 120px;
@@ -72,131 +73,172 @@
     color: #9ca3af;
 }
 
-.styledInput.done {
-    border-radius: 6px;
-    border: 2px solid #2986E8;
+/* Thinking state - during animation */
+.styledInput.thinking {
+    border: none;
     background: #1D252F;
-    box-shadow: -32px -32px 60px 0px rgba(16, 159, 212, 0.12) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.12) inset;
+    animation: pulse-shadow 3s ease-in-out infinite;
 }
 
-@keyframes trace-outline {
-    to {
-        stroke-dashoffset: 0;
+@keyframes pulse-shadow {
+    0%, 100% {
+        box-shadow: -24px -24px 60px 0px rgba(16, 159, 212, 0.24) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.24) inset;
+    }
+    50% {
+        box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
     }
 }
 
-@keyframes move-gradient {
-    from {
-        stroke: url(#loading-gradient);
-    }
-    to {
-        stroke: url(#loading-gradient);
-    }
+/* Output state - after animation completes */
+.styledInput.output {
+    border: none;
+    background: #1D252F;
+    box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
+    animation: fade-out-glow 3s ease forwards;
 }
 
+/* SVG outline container */
 .thinkingOutline {
     display: none;
     position: absolute;
     top: 0;
     left: 0;
-    width: 440px;
-    height: 120px;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     border-radius: 6px;
+    z-index: 1;
 }
 
-.outlinePath {
-    fill: none;
-    stroke: #2986E8;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 240 1120;
-    stroke-dashoffset: 1360;
-    transition: none;
-}
-
+/* Animated gradient border for thinking state */
 .gradientPath {
     fill: none;
     stroke: url(#loading-gradient);
-    stroke-width: 2;
+    stroke-width: 4;
     stroke-linecap: round;
-    stroke-dasharray: 240 1120;
+    stroke-dasharray: 92 1280;
     stroke-dashoffset: 1360;
     transition: none;
-    filter: drop-shadow(0 0 2px rgba(16, 159, 212, 0.12)), drop-shadow(0 0 2px rgba(13, 141, 150, 0.12));
+    filter: drop-shadow(0 0 2px rgba(16, 159, 212, 0.12));
+    opacity: 0.3;
 }
 
+/* Base border for thinking state */
+.basePath {
+    fill: none;
+    stroke: #29B5E8;
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.3;
+}
+
+/* Completed gradient border for output state */
+.outlinePath {
+    fill: none;
+    stroke: url(#completed-gradient);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    transition: stroke-width 0.1s ease;
+}
+
+/* Thinking state - show animated border */
 .thinkingOutline.thinking {
     display: block;
 }
 
-.thinkingOutline.thinking .outlinePath,
-.thinkingOutline.thinking .gradientPath {
-    animation: trace-outline 3s linear infinite;
-}
-
-.thinkingOutline.done {
-    display: block;
-}
-
-.thinkingOutline.done .outlinePath {
-    stroke: url(#completed-gradient);
-    stroke-dasharray: 0;
-    stroke-dashoffset: 0;
-}
-
-.thinkingOutline.done .gradientPath {
+.thinkingOutline.thinking .outlinePath {
     display: none;
 }
 
-.toggleButton {
-    padding: 10px 16px;
-    font-size: 16px;
-    background-color: #60a5fa;
-    color: #111827;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.thinkingOutline.thinking .basePath {
+    opacity: 1;
+    stroke-width: 6;
+    stroke: url(#completed-gradient);
 }
 
-.toggleButton:hover {
-    background-color: #93c5fd;
+.thinkingOutline.thinking .gradientPath {
+    stroke-width: 6;
+    animation: trace-outline 3s linear infinite;
+    opacity: 1;
+}
+
+/* Output state - show completed border */
+.thinkingOutline.output {
+    display: block;
+}
+
+.thinkingOutline.output .outlinePath {
+    stroke: url(#completed-gradient);
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    stroke-width: 6;
+    animation: fade-out-stroke 3s ease forwards;
+}
+
+.thinkingOutline.output .basePath {
+    stroke-width: 6;
+    stroke: url(#completed-gradient);
+    opacity: 1;
+    animation: fade-out-stroke 3s ease forwards;
+}
+
+.thinkingOutline.output .gradientPath {
+    display: none;
+}
+
+@keyframes trace-outline {
+    0% {
+        stroke-dasharray: 92 1360;
+        stroke-dashoffset: 1360;
+    }
+    100% {
+        stroke-dasharray: 92 1360;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fade-out-glow {
+    0% {
+        box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
+        background: #1D252F;
+        border: none;
+    }
+    100% {
+        box-shadow: none;
+        background: #1f2937;
+        border: 1px solid #293246;
+    }
+}
+
+@keyframes fade-out-stroke {
+    0% {
+        stroke-opacity: 1;
+        stroke-width: 6;
+    }
+    100% {
+        stroke-opacity: 0;
+        stroke-width: 1;
+    }
 }
 
 .buttonContainer {
-    margin-top: 20px;
+    margin-top: 72px;
     display: flex;
     justify-content: center;
     gap: 12px;
-}
-
-@keyframes rotate-gradient {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.thinkingOutline.thinking .outlinePath {
-    animation: trace-outline 3s linear infinite;
-}
-
-.thinkingOutline.thinking linearGradient {
-    animation: rotate-gradient 3s linear infinite;
 }
 
 .viewButton {
     padding: 10px 16px;
     font-size: 16px;
     background-color: transparent;
-    color: #60a5fa;
-    border: 1px solid #60a5fa;
+    color: #FFFFFF;
+    border: 1px solid #FFFFFF;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.1s ease;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -204,11 +246,11 @@
 }
 
 .viewButton:hover {
-    background-color: rgba(96, 165, 250, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .externalIcon {
-    transition: transform 0.3s ease;
+    transition: transform 0.1s ease;
 }
 
 .viewButton:hover .externalIcon {
@@ -230,11 +272,14 @@
     border-radius: 16px;
     background: linear-gradient(
         90deg,
-        rgba(16, 102, 133, 0.25) 0%,
-        rgba(0, 73, 99, 0.50) 25%,
-        rgba(0, 89, 121, 0.50) 50%,
-        rgba(0, 73, 99, 0.50) 75%,
-        rgba(16, 102, 133, 0.25) 100%
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.16) 20%,
+        rgba(0, 0, 0, 0.16) 35%,
+        rgba(0, 0, 0, 0.08) 50%,
+        rgba(0, 0, 0, 0.08) 50%,
+        rgba(0, 0, 0, 0.16) 65%,
+        rgba(0, 0, 0, 0.16) 80%,
+        rgba(0, 0, 0, 0.08) 100%
     );
     background-size: 200% 100%;
 }
@@ -248,11 +293,11 @@
 }
 
 @keyframes shimmer {
-    0% {
-        background-position: 120% 0;
+    from {
+        background-position: 0% 0;
     }
-    100% {
-        background-position: -120% 0;
+    to {
+        background-position: -200% 0;
     }
 }
 

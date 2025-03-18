@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { ProjectPageTemplate } from './layouts/ProjectPageTemplate';
 import { PageHeader } from './components/PageHeader';
 
@@ -9,23 +8,10 @@ export default function Home() {
   return (
     <ProjectPageTemplate>
       <PageHeader
-        title="Design Lab"
-        description="Harold's personal sandbox at Snowflake Design. All examples are built in Next.js and either Tailwind CSS or Balto."
+        title="DesignLab"
+        description={<>Welcome to <a href="https://snowflake.enterprise.slack.com/team/U088AC6FKEH" target="_blank" rel="noopener noreferrer" className="hover:text-white">@harold.kim</a>&apos;s personal sandbox at Snowflake Design.<br />All concepts are built in Next.js, Tailwind, and Balto. Please do not reference this document as a source of truth.</>}
         centered
-        className="mb-8"
       />
-
-      <div className="flex justify-center">
-        <Link
-          href="/loading-states"
-          className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium"
-        >
-          View Components
-          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
     </ProjectPageTemplate>
   );
 }

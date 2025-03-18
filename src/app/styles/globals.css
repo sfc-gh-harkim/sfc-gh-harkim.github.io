@@ -3,27 +3,70 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors */
+  --color-background-primary: #111827;
+  --color-background-secondary: #1f2937;
+  --color-background-tertiary: #1E252F;
+  --color-background-input: #1D252F;
+
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #F3F4F6;
+  --color-text-tertiary: #D1D5DB;
+  --color-text-muted: #9CA3AF;
+  --color-text-status: #BDC4D5;
+
+  --color-border-primary: #293246;
+  --color-border-secondary: #374151;
+
+  --color-brand-primary: #2986E8;
+  --color-brand-hover: #2476D1;
+
+  /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-plus-jakarta-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Spacing */
+  --spacing-sidebar-width: 18rem;
+  --spacing-sidebar-padding: 2rem;
+  --spacing-container-padding-x: 2rem;
+  --spacing-container-padding-y: 3rem;
+
+  /* Animation */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Shadows */
+  --shadow-modal: 0px 4px 16px 0px rgba(0, 0, 0, 0.30);
+  --shadow-input: -32px -32px 60px 0px rgba(16, 159, 212, 0.12) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.12) inset;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-base: 6px;
+  --radius-lg: 8px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--color-background-primary);
+  --color-foreground: var(--color-text-primary);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background-primary: #0a0a0a;
+    --color-text-primary: #ededed;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background-color: var(--color-background-primary);
+  font-family: var(--font-plus-jakarta-sans);
+  transition: background-color 2s ease;
+}
+
+main {
+  min-height: 100vh;
 }

@@ -3,48 +3,17 @@
 import React from 'react';
 import { ProjectPageTemplate } from '../layouts/ProjectPageTemplate';
 import { PageHeader } from '../components/PageHeader';
-import { Grid } from '../components/Grid';
-import { Card } from '../components/Card';
-import Link from 'next/link';
 
 export default function LoadingStatesPage() {
     return (
         <ProjectPageTemplate>
             <PageHeader 
                 title="Loading States" 
-                description="A collection of loading indicators and animations"
-                className="mb-8"
+                description="This project is crucial because current loading state patterns fail to accommodate the long processing times often associated with AI features, detracting from the user experience and discouraging adoption. By delivering new, inclusive AI loading state patterns that gracefully manage these longer durations, we can directly address this pain point and pave the way for the seamless integration of AI features throughout Snowflake experiences, ultimately driving increased user engagement and adoption of AI-powered capabilities."
+                figmaLink="https://www.figma.com/file/example-loading-states"
+                reviewDocLink="https://docs.google.com/document/d/example-loading-states"
+                presentationLink="https://docs.google.com/presentation/d/example-loading-states"
             />
-            <Grid>
-                <Card
-                    title="AI Input Loader"
-                    description="A loading indicator for AI input processing with a dynamic dot animation."
-                >
-                    <Link
-                        href="/loading-states/ai-input-loader"
-                        className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium"
-                    >
-                        View Component
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
-                </Card>
-                <Card
-                    title="Multi AI Input Loader"
-                    description="Multiple synchronized loading indicators for parallel AI processing tasks."
-                >
-                    <Link
-                        href="/loading-states/multi-ai-input-loader"
-                        className="inline-flex items-center text-blue-400 hover:text-blue-300 font-medium"
-                    >
-                        View Component
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </Link>
-                </Card>
-            </Grid>
         </ProjectPageTemplate>
     );
 } 

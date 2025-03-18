@@ -43,10 +43,10 @@ export function Sidebar() {
   const normalizedPathname = normalizePath(pathname);
 
   return (
-    <aside className="w-64 bg-gray-800 h-screen fixed left-0 top-0 overflow-y-auto">
-      <div className="p-4">
-        <Link href="/" className="text-xl font-bold text-gray-100 hover:text-gray-300">
-          Design Lab
+    <aside className="w-72 h-screen fixed left-0 top-0 overflow-y-auto font-plus-jakarta-sans z-50">
+      <div className="p-8">
+        <Link href="/" className="text-[32px] leading-[40px] font-semibold text-gray-100 hover:text-gray-300">
+          DesignLab
         </Link>
         <nav className="mt-8 space-y-4">
           {sidebarItems.map((item) => (
@@ -70,7 +70,7 @@ export function Sidebar() {
                       className={
                         normalizedPathname === normalizePath(child.href)
                           ? "block text-sm text-white font-bold"
-                          : "block text-sm text-gray-400 hover:text-gray-300"
+                          : "block text-sm text-white/80 hover:text-white"
                       }
                     >
                       {child.title}

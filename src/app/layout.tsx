@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { inter } from "./styles/fonts";
+import { inter, plusJakartaSans } from "./styles/fonts";
 import "./styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Design Lab",
+  title: "DesignLab",
   description: "A collection of reusable React components",
   robots: {
     index: false,
@@ -22,12 +22,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${inter.variable}`}>
+    <html lang="en" className={`dark ${inter.variable} ${plusJakartaSans.variable}`}>
       <head>
         <meta name="robots" content="noindex,nofollow" />
         <meta name="googlebot" content="noindex,nofollow" />
       </head>
-      <body className="bg-gray-900 text-gray-100">{children}</body>
+      <body className="bg-gray-900 text-gray-100 font-plus-jakarta-sans">
+        <main>
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

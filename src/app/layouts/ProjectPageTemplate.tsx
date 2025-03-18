@@ -1,18 +1,27 @@
-import React, { ReactNode } from 'react';
-import { ComponentLayout } from './ComponentLayout';
+import React from 'react';
+import { Sidebar } from './Sidebar';
+import { usePathname } from 'next/navigation';
 
 interface ProjectPageTemplateProps {
-    children: ReactNode;
+    children: React.ReactNode;
 }
 
 export function ProjectPageTemplate({ children }: ProjectPageTemplateProps) {
+    const pathname = usePathname();
+    const isHomePage = pathname === '/';
+    
+    const mainClasses = isHomePage
+        ? "min-h-screen flex items-center"
+        : "";
+
     return (
-        <ComponentLayout>
-            <div className="ml-64 min-h-screen flex items-center justify-center">
-                <div className="w-full max-w-7xl p-8">
+        <div className={`min-h-screen transition-colors duration-300 ${isHomePage ? 'bg-[#0080c2]' : 'bg-gray-900'}`}>
+            <Sidebar />
+            <main className={mainClasses}>
+                <div className={`w-full max-w-[800px] mx-auto py-12 px-8 ${!isHomePage ? 'font-inter' : ''}`}>
                     {children}
                 </div>
-            </div>
-        </ComponentLayout>
+            </main>
+        </div>
     );
 } 

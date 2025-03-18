@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AIInputLoader } from '@/app/loading-states/ai-input-loader/AIInputLoader';
+import { BaseAIInputLoader } from '@/app/loading-states/ai-input-loader/BaseAIInputLoader';
 
 export interface MultiAIInputLoaderProps {
     count?: number;
@@ -14,17 +14,18 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({ count = 
         <div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 {Array.from({ length: count }, (_, index) => (
-                    <AIInputLoader
+                    <BaseAIInputLoader
                         key={index}
                         isTriggered={isActive}
                         hideButton={true}
                         startDelay={index * 200}
+                        variant="shimmer"
                     />
                 ))}
             </div>
             <div className="mt-8 flex justify-center">
                 <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    className="px-4 py-2 bg-transparent text-white border border-white rounded hover:bg-white/10 transition-colors"
                     onClick={() => setIsActive(prev => !prev)}
                 >
                     {isActive ? 'Reset' : 'Start All'}
