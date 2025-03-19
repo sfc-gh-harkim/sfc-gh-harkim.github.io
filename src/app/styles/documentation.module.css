@@ -1,0 +1,36 @@
+.buttonContainer {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.viewButton {
+    padding: 14px 16px;
+    min-width: 160px;
+    font-size: 16px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.viewButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.externalIcon {
+    transition: transform 0.1s ease;
+}
+
+.viewButton:hover .externalIcon {
+    transform: translate(2px, -2px);
+} 

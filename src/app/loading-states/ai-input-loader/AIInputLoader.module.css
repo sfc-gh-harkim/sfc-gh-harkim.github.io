@@ -51,6 +51,7 @@
 
 /* Default state - initial text area */
 .styledInput {
+    overflow: hidden;
     width: 440px;
     padding: 24px;
     padding-top: 52px;
@@ -59,7 +60,8 @@
     border: 1px solid #293246;
     border-radius: 6px;
     background-color: #1f2937;
-    transition: all 0.1s ease;
+    transition: all 0.3s ease;
+    box-shadow: none;
     outline: none;
     position: relative;
     color: #f3f4f6;
@@ -75,9 +77,18 @@
 
 /* Thinking state - during animation */
 .styledInput.thinking {
-    border: none;
+    border: 1px solid transparent;
     background: #1D252F;
-    animation: pulse-shadow 3s ease-in-out infinite;
+    animation: fade-in-shadow 0.3s ease forwards, pulse-shadow 3s ease-in-out infinite 0.3s;
+}
+
+@keyframes fade-in-shadow {
+    from {
+        box-shadow: none;
+    }
+    to {
+        box-shadow: -24px -24px 60px 0px rgba(16, 159, 212, 0.24) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.24) inset;
+    }
 }
 
 @keyframes pulse-shadow {
@@ -91,7 +102,7 @@
 
 /* Output state - after animation completes */
 .styledInput.output {
-    border: none;
+    border: 1px solid transparent;
     background: #1D252F;
     box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
     animation: fade-out-glow 3s ease forwards;
@@ -203,7 +214,7 @@
     0% {
         box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
         background: #1D252F;
-        border: none;
+        border: 1px solid transparent;
     }
     100% {
         box-shadow: none;
@@ -221,40 +232,6 @@
         stroke-opacity: 0;
         stroke-width: 1;
     }
-}
-
-.buttonContainer {
-    margin-top: 72px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-}
-
-.viewButton {
-    padding: 10px 16px;
-    font-size: 16px;
-    background-color: transparent;
-    color: #FFFFFF;
-    border: 1px solid #FFFFFF;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.1s ease;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.viewButton:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.externalIcon {
-    transition: transform 0.1s ease;
-}
-
-.viewButton:hover .externalIcon {
-    transform: translate(2px, -2px);
 }
 
 .skeletonContainer {

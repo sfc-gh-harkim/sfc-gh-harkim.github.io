@@ -56,7 +56,7 @@ export function Sidebar() {
                 className={
                   normalizedPathname === normalizePath(item.href)
                     ? "block text-sm text-white font-bold"
-                    : "block text-sm text-gray-300 hover:text-gray-100"
+                    : "block text-sm text-white/80 hover:text-white"
                 }
               >
                 {item.title}

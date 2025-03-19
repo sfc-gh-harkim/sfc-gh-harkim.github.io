@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './AIInputLoader.module.css';
+import docStyles from '@/app/styles/documentation.module.css';
 
 export interface BaseAIInputLoaderProps {
     onThinkingComplete?: () => void;
@@ -196,12 +197,12 @@ export function BaseAIInputLoader({
                 )}
             </div>
             {!hideButton && (
-                <div className={styles.buttonContainer}>
+                <div className={docStyles.buttonContainer}>
                     <a
-                        href={`/loading-states/ai-input-loader/single-col?variant=${variant}`}
+                        href={`/loading-states/ai-input-loader/in-situ?variant=${variant}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={styles.viewButton}
+                        className={docStyles.viewButton}
                     >
                         Single Col
                         <svg
@@ -214,7 +215,7 @@ export function BaseAIInputLoader({
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className={styles.externalIcon}
+                            className={docStyles.externalIcon}
                         >
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                             <polyline points="15 3 21 3 21 9" />
@@ -222,10 +223,10 @@ export function BaseAIInputLoader({
                         </svg>
                     </a>
                     <a
-                        href={`/loading-states/ai-input-loader/single-object?variant=${variant}`}
+                        href={`/loading-states/ai-input-loader/in-situ?variant=${variant}&tab=details`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={styles.viewButton}
+                        className={docStyles.viewButton}
                     >
                         Single Object
                         <svg
@@ -238,7 +239,7 @@ export function BaseAIInputLoader({
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className={styles.externalIcon}
+                            className={docStyles.externalIcon}
                         >
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                             <polyline points="15 3 21 3 21 9" />
