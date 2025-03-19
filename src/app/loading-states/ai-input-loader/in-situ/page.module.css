@@ -422,7 +422,8 @@
 }
 
 .modalContent.reviewModal {
-    width: 1152px;
+    width: 1032px;
+    overflow: hidden;
     height: auto;
     padding: 32px;
     display: flex;

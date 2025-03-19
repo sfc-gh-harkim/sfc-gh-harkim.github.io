@@ -587,12 +587,10 @@ function SingleColContent() {
                                     <td>{column.sampleValues.join('\n')}</td>
                                     {index === 0 && (
                                         <td rowSpan={6} style={{ padding: 0 }}>
-                                            <div style={{ width: '100%', padding: '16px', marginTop: '-48px' }}>
+                                            <div style={{ width: '600px', padding: '16px', marginTop: '-48px' }}>
                                                 <MultiAIInputLoader
-                                                    variant={variant}
+                                                    variant="shimmer"
                                                     isTriggered={true}
-                                                    startDelay={0}
-                                                    width={600}
                                                     hideTracer={true}
                                                 />
                                             </div>

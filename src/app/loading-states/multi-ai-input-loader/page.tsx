@@ -16,8 +16,6 @@ export default function MultiAIInputLoaderPage() {
                         variant="looping"
                         isTriggered={isTriggered}
                         count={6}
-                        width={440}
-                        height={120}
                     />
                     <div className="mt-8 flex justify-center gap-3">
                         <button

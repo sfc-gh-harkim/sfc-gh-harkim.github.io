@@ -6,10 +6,7 @@ import aiStyles from '../ai-input-loader/AIInputLoader.module.css';
 
 interface MultiAIInputLoaderProps {
     onThinkingComplete?: () => void;
-    width?: number;
-    height?: number;
     isTriggered?: boolean;
-    startDelay?: number;
     variant?: 'looping' | 'shimmer';
     shouldReset?: boolean;
     count?: number;
@@ -18,10 +15,7 @@ interface MultiAIInputLoaderProps {
 
 export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     onThinkingComplete,
-    width = 400,
-    height = 72,
     isTriggered = false,
-    startDelay = 0,
     variant = 'looping',
     shouldReset = false,
     count = 5,
@@ -29,6 +23,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
 }) => {
     const [isThinking, setIsThinking] = useState(false);
     const [isOutput, setIsOutput] = useState(false);
+    const [isFadingOut, setIsFadingOut] = useState(false);
     const [currentPlaceholders, setCurrentPlaceholders] = useState<string[]>(Array(count).fill(''));
     const [statusText, setStatusText] = useState('Connecting to database');
 
@@ -50,6 +45,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
         if (shouldReset) {
             setIsThinking(false);
             setIsOutput(false);
+            setIsFadingOut(false);
             setCurrentPlaceholders(Array(count).fill(''));
             setStatusText('Connecting to database');
         }
@@ -65,24 +61,40 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     const animatePlaceholders = async () => {
+        // Match AIInputLoader's timing exactly
         for (const { text, duration } of placeholderSequence) {
             setStatusText(text);
             await sleep(duration);
         }
 
         setStatusText('CORTEX-GENERATED DESCRIPTION');
-        await typeText();
+        
+        // Start fade out of skeleton shimmer
+        setIsFadingOut(true);
+        await sleep(400); // Match AIInputLoader's fade out duration
+        
+        // Complete the transition
         setIsThinking(false);
         setIsOutput(true);
+        
+        // Start staggered output animations
+        await typeText();
+        
+        // Wait for output glow to complete before fading out
+        await sleep(1000); // Wait for glow animation to complete
+        
         onThinkingComplete?.();
     };
 
     const typeText = async () => {
         // Create separate typing animations for each text area
         const typePromises = finalTexts.slice(0, 5).map(async (text, index) => {
-            // Wait for the staggered thinking state to complete
-            await sleep(index * 200);
+            // Add stagger effect for each item after the first
+            if (index > 0) {
+                await sleep(400 * index);
+            }
             
+            // Match AIInputLoader's typing speed
             for (let i = 0; i <= text.length; i++) {
                 setCurrentPlaceholders(prev => {
                     const newPlaceholders = [...prev];
@@ -116,14 +128,13 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                                 width: '600px',
                                 height: '72px', 
                                 resize: 'none',
-                                animationDelay: `${startDelay + (index * 200)}ms`,
                                 padding: '16px'
                             }}
                         />
                         {!hideTracer && (
                             <svg
                                 className={`${aiStyles.thinkingOutline} ${variant === 'looping' ? (isThinking ? aiStyles.thinking : '') : ''} ${isOutput ? aiStyles.output : ''}`}
-                                width={width}
+                                width={600}
                                 height={72}
                             >
                                 <defs>
@@ -150,34 +161,36 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                                 </defs>
                                 <rect
                                     className={aiStyles.outlinePath}
-                                    width={width}
+                                    width={600}
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                                 <rect
                                     className={aiStyles.basePath}
-                                    width={width}
+                                    width={600}
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                                 <rect
                                     className={aiStyles.gradientPath}
-                                    width={width}
+                                    width={600}
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                             </svg>
                         )}
-                        {variant === 'shimmer' && (
+                        {isThinking && !isOutput && (
                             <div 
                                 className={aiStyles.skeletonContainer}
                                 style={{ 
-                                    opacity: isThinking && !isOutput ? 1 : 0, 
+                                    opacity: isFadingOut ? 0 : 1,
                                     transition: 'opacity 0.3s ease',
-                                    animationDelay: `${startDelay + (index * 200)}ms`
+                                    top: '16px',
+                                    left: '16px',
+                                    right: '16px'
                                 }}
                             >
                                 <div className={`${aiStyles.skeletonLine} ${aiStyles.shimmer}`}></div>
