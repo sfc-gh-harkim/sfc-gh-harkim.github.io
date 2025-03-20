@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import multiStyles from './MultiAIInputLoader.module.css';
 import aiStyles from '../ai-input-loader/AIInputLoader.module.css';
+import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
 
 interface MultiAIInputLoaderProps {
     onThinkingComplete?: () => void;
@@ -112,6 +113,14 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     return (
         <div className={multiStyles.container}>
             <div className={multiStyles.statusTextContainer}>
+                <div className={multiStyles.avatarContainer}>
+                    <AnimatedAvatar 
+                        width={20} 
+                        height={20}
+                        isPlaying={isThinking}
+                        isOutput={isOutput}
+                    />
+                </div>
                 <span className={multiStyles.statusText}>
                     {statusText}
                     {isThinking && <span className={multiStyles.ellipsis}></span>}

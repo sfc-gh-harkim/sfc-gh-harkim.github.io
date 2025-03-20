@@ -28,6 +28,7 @@ const sidebarItems: SidebarItem[] = [
     href: '/avatar',
     children: [
       { title: 'States', href: '/avatar/states' },
+      { title: 'Dynamic Expressions', href: '/avatar/dynamic-expressions' },
     ],
   },
 ];

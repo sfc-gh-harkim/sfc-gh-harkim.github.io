@@ -1,15 +1,40 @@
 'use client';
 
 import React from 'react';
-import { ProjectPageTemplate } from '@/app/layouts/ProjectPageTemplate';
-import AvatarStates from './States';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { ProjectPageTemplate } from '../../layouts/ProjectPageTemplate';
+import styles from './page.module.css';
 
-export default function AvatarStatesPage() {
+export default function StatesPage() {
     return (
         <ProjectPageTemplate>
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="w-full max-w-md">
-                    <AvatarStates />
+            <div className={styles.lottieContainer}>
+                <div className={styles.lottieWrapper}>
+                    <h3>Open State</h3>
+                    <DotLottieReact
+                        src="/assets/avatar-open.lottie"
+                        autoplay
+                        loop
+                        style={{ width: '100px', height: '100px' }}
+                    />
+                </div>
+                <div className={styles.lottieWrapper}>
+                    <h3>Repeat State</h3>
+                    <DotLottieReact
+                        src="/assets/avatar-repeat.lottie"
+                        autoplay
+                        loop
+                        style={{ width: '100px', height: '100px' }}
+                    />
+                </div>
+                <div className={styles.lottieWrapper}>
+                    <h3>Close State</h3>
+                    <DotLottieReact
+                        src="/assets/avatar-close.lottie"
+                        autoplay
+                        loop
+                        style={{ width: '100px', height: '100px' }}
+                    />
                 </div>
             </div>
         </ProjectPageTemplate>

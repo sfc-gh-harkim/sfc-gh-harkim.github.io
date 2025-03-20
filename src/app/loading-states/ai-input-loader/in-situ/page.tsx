@@ -519,103 +519,109 @@ function SingleColContent() {
                     )}
                 </div>
             </div>
-            <div className={`${styles.modal} ${isModalVisible ? styles.visible : ''}`}>
-                <div className={styles.modalContent}>
-                    <BaseAIInputLoader
-                        variant={variant}
-                        hideButton={true}
-                        isTriggered={true}
-                        startDelay={500}
-                        shouldReset={shouldReset}
-                    />
-                    <div className={styles.buttonContainer}>
-                        <button 
-                            className={styles.cancelButton}
-                            onClick={handleClose}
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            className={styles.saveButton}
-                            onClick={handleClose}
-                        >
-                            Save
-                        </button>
+            {isModalVisible && (
+                <div className={`${styles.modal} ${styles.visible}`}>
+                    <div className={styles.modalContent}>
+                        <BaseAIInputLoader
+                            variant={variant}
+                            hideButton={true}
+                            isTriggered={true}
+                            startDelay={500}
+                            shouldReset={shouldReset}
+                        />
+                        <div className={styles.buttonContainer}>
+                            <button 
+                                className={styles.cancelButton}
+                                onClick={handleClose}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className={styles.saveButton}
+                                onClick={handleClose}
+                            >
+                                Save
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className={`${styles.modal} ${isReviewModalVisible ? styles.visible : ''}`}>
-                <div className={`${styles.modalContent} ${styles.reviewModal}`}>
-                    <h2 className={styles.modalTitle}>Review Cortex-generated descriptions</h2>
-                    <p className={styles.modalSubtitle}>
-                        Select descriptions that you want to save. For large tables, descriptions can only be generated for 50 columns at
-                        a time. Only columns without descriptions will be included below.
-                    </p>
-                    <table className={styles.reviewTable}>
-                        <thead>
-                            <tr>
-                                <th style={{ width: '40px' }}>
-                                    <input
-                                        type="checkbox"
-                                        className={styles.checkbox}
-                                        checked={selectedColumns.length === columns.length}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setSelectedColumns(columns.map(col => col.name));
-                                            } else {
-                                                setSelectedColumns([]);
-                                            }
-                                        }}
-                                    />
-                                </th>
-                                <th>COLUMN</th>
-                                <th colSpan={2}>SAMPLE VALUES</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {columns.map((column, index) => (
-                                <tr key={column.name}>
-                                    <td>
+            )}
+            {isReviewModalVisible && (
+                <div className={`${styles.modal} ${styles.visible}`}>
+                    <div className={`${styles.modalContent} ${styles.reviewModal}`}>
+                        <h2 className={styles.modalTitle}>Review Cortex-generated descriptions</h2>
+                        <p className={styles.modalSubtitle}>
+                            Select descriptions that you want to save. For large tables, descriptions can only be generated for 50 columns at
+                            a time. Only columns without descriptions will be included below.
+                        </p>
+                        <table className={styles.reviewTable}>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '40px' }}>
                                         <input
                                             type="checkbox"
                                             className={styles.checkbox}
-                                            checked={selectedColumns.includes(column.name)}
-                                            onChange={() => handleCheckboxChange(column.name)}
+                                            checked={selectedColumns.length === columns.length}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setSelectedColumns(columns.map(col => col.name));
+                                                } else {
+                                                    setSelectedColumns([]);
+                                                }
+                                            }}
                                         />
-                                    </td>
-                                    <td>{column.name}</td>
-                                    <td>{column.sampleValues.join('\n')}</td>
-                                    {index === 0 && (
-                                        <td rowSpan={6} style={{ padding: 0 }}>
-                                            <div style={{ width: '600px', padding: '16px', marginTop: '-48px' }}>
-                                                <MultiAIInputLoader
-                                                    variant="shimmer"
-                                                    isTriggered={true}
-                                                    hideTracer={true}
-                                                />
-                                            </div>
-                                        </td>
-                                    )}
+                                    </th>
+                                    <th>COLUMN</th>
+                                    <th colSpan={2}>SAMPLE VALUES</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div className={styles.buttonContainer}>
-                        <button 
-                            className={styles.cancelButton}
-                            onClick={() => setIsReviewModalVisible(false)}
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            className={styles.saveButton}
-                            onClick={() => setIsReviewModalVisible(false)}
-                        >
-                            Save
-                        </button>
+                            </thead>
+                            <tbody>
+                                {columns.map((column, index) => (
+                                    <tr key={column.name}>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                className={styles.checkbox}
+                                                checked={selectedColumns.includes(column.name)}
+                                                onChange={() => handleCheckboxChange(column.name)}
+                                            />
+                                        </td>
+                                        <td>{column.name}</td>
+                                        <td>{column.sampleValues.join('\n')}</td>
+                                        {index === 0 && (
+                                            <td rowSpan={6} style={{ padding: 0 }}>
+                                                <div style={{ width: '600px', padding: '16px', marginTop: '-48px' }}>
+                                                    {isReviewModalVisible && (
+                                                        <MultiAIInputLoader
+                                                            variant="shimmer"
+                                                            isTriggered={true}
+                                                            hideTracer={true}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <div className={styles.buttonContainer}>
+                            <button 
+                                className={styles.cancelButton}
+                                onClick={() => setIsReviewModalVisible(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className={styles.saveButton}
+                                onClick={() => setIsReviewModalVisible(false)}
+                            >
+                                Save
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </>
     );
 }

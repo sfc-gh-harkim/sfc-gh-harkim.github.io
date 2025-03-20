@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AIInputLoader.module.css';
 import docStyles from '@/app/styles/documentation.module.css';
+import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
 
 export interface BaseAIInputLoaderProps {
     onThinkingComplete?: () => void;
@@ -38,7 +39,6 @@ export function BaseAIInputLoader({
     const [currentPlaceholder, setCurrentPlaceholder] = useState("");
     const [statusText, setStatusText] = useState("");
     const [ellipsis, setEllipsis] = useState('');
-    const [value, setValue] = useState('');
 
     const animateEllipsis = () => {
         let count = 0;
@@ -66,7 +66,6 @@ export function BaseAIInputLoader({
 
     useEffect(() => {
         if (shouldReset) {
-            setValue('');
             setIsThinking(false);
             setIsOutput(false);
             setCurrentPlaceholder("");
@@ -112,7 +111,7 @@ export function BaseAIInputLoader({
             setStatusText("Cortex-Generated");
             await typeText(FINAL_TEXT);
             onThinkingComplete?.();
-        } catch (error) {
+        } catch {
             clearInterval(ellipsisInterval);
             setIsThinking(false);
             setIsOutput(false);
@@ -134,7 +133,17 @@ export function BaseAIInputLoader({
                             </button>
                         </span>
                     ) : (
-                        <span className={styles.statusText}>{statusText}</span>
+                        <>
+                            <div className={styles.avatarContainer}>
+                                <AnimatedAvatar 
+                                    width={20} 
+                                    height={20}
+                                    isPlaying={isThinking}
+                                    isOutput={isOutput}
+                                />
+                            </div>
+                            <span className={styles.statusText}>{statusText}</span>
+                        </>
                     )}
                 </div>
                 <textarea
