@@ -11,55 +11,47 @@ interface AnimatedAvatarProps {
     isPlaying?: boolean;
     isStopping?: boolean;
     isOutput?: boolean;
+    onComplete?: () => void;
 }
 
 export function AnimatedAvatar({ 
     width = 200, 
     height = 200,
     className,
-    isPlaying: externalIsPlaying,
-    isStopping: externalIsStopping,
-    isOutput: externalIsOutput
+    isPlaying = false,
+    isStopping = false,
+    isOutput = false,
+    onComplete
 }: AnimatedAvatarProps) {
     const [currentAnimation, setCurrentAnimation] = useState<'open' | 'repeat' | 'close'>('open');
-    const [isPlaying, setIsPlaying] = useState(false);
     const [shouldLoop, setShouldLoop] = useState(false);
     const [dotLottie, setDotLottie] = useState<DotLottie | null>(null);
-    const [isStopping, setIsStopping] = useState(false);
 
     // Handle external state changes
     useEffect(() => {
-        if (externalIsPlaying !== undefined) {
-            setIsPlaying(externalIsPlaying);
-        }
-        if (externalIsStopping !== undefined) {
-            setIsStopping(externalIsStopping);
-        }
-        if (externalIsOutput) {
+        if (isOutput) {
             setCurrentAnimation('close');
             setShouldLoop(false);
         }
-    }, [externalIsPlaying, externalIsStopping, externalIsOutput]);
+    }, [isOutput]);
 
-    // Auto-play when mounted (only if no external control)
+    // Handle stop state changes
     useEffect(() => {
-        if (externalIsPlaying === undefined) {
-            setIsPlaying(true);
-            setShouldLoop(true);
-            setCurrentAnimation('open');
-            setIsStopping(false);
-        }
-    }, [externalIsPlaying]);
-
-    const handleComplete = useCallback(() => {
-        // If we're stopping and just finished a repeat cycle, transition to close
         if (isStopping && currentAnimation === 'repeat') {
             setCurrentAnimation('close');
             setShouldLoop(false);
-            setIsStopping(false);
-            return;
         }
+    }, [isStopping, currentAnimation]);
 
+    // Auto-play when mounted (only if no external control)
+    useEffect(() => {
+        if (isPlaying === undefined) {
+            setShouldLoop(true);
+            setCurrentAnimation('open');
+        }
+    }, [isPlaying]);
+
+    const handleComplete = useCallback(() => {
         if (currentAnimation === 'open') {
             // When open animation completes, immediately start repeat
             setCurrentAnimation('repeat');
@@ -69,10 +61,9 @@ export function AnimatedAvatar({
             }
         } else if (currentAnimation === 'close') {
             setCurrentAnimation('open');
-            setIsPlaying(false);
-            setShouldLoop(false);
+            onComplete?.();
         }
-    }, [currentAnimation, isStopping, dotLottie]);
+    }, [currentAnimation, dotLottie, onComplete]);
 
     // Handle animation loading and state changes
     useEffect(() => {

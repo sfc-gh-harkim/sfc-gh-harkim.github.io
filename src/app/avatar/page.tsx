@@ -9,7 +9,7 @@ export default function AvatarPage() {
         <ProjectPageTemplate>
             <PageHeader 
                 title="Avatar" 
-                description="A versatile avatar component that supports various states and sizes, designed for user profile displays and interactive elements."
+                description="A versatile avatar component that supports various states, sizes, and expressions."
                 figmaLink="https://www.figma.com/file/example-avatar"
                 reviewDocLink="https://docs.google.com/document/d/example-avatar"
                 presentationLink="https://docs.google.com/presentation/d/example-avatar"

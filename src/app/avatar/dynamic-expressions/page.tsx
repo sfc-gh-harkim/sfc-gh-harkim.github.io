@@ -19,6 +19,11 @@ export default function DynamicExpressionsPage() {
         setIsStopping(true);
     }, []);
 
+    const handleComplete = useCallback(() => {
+        setIsPlaying(false);
+        setIsStopping(false);
+    }, []);
+
     return (
         <ProjectPageTemplate>
             <div className={styles.container}>
@@ -34,6 +39,7 @@ export default function DynamicExpressionsPage() {
                         height={200}
                         isPlaying={isPlaying}
                         isStopping={isStopping}
+                        onComplete={handleComplete}
                     />
                     <div className={docStyles.buttonContainer}>
                         <button 
@@ -42,6 +48,18 @@ export default function DynamicExpressionsPage() {
                             disabled={isPlaying}
                         >
                             Thinking
+                        </button>
+                        <button 
+                            className={docStyles.viewButton}
+                            disabled={true}
+                        >
+                            Caution
+                        </button>
+                        <button 
+                            className={docStyles.viewButton}
+                            disabled={true}
+                        >
+                            Idle
                         </button>
                         <button 
                             onClick={handleStop}
