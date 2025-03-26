@@ -39,8 +39,7 @@ function TableDetailsTab() {
                     <div className={styles.sectionContent}>
                         <h3 className={styles.detailsTitle}>Description</h3>
                         <BaseAIInputLoader 
-                            variant={variant} 
-                            hideButton 
+                            variant={variant}  
                             width={1000}
                             height={isThinking ? 120 : 80}
                             isTriggered={isThinking}
@@ -148,7 +147,7 @@ function SingleColContent() {
     const handleTabClick = (newTab: string) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', newTab);
-        router.push(`/loading-states/ai-input-loader/in-situ?${params.toString()}`);
+        router.push(`/loading-states/ai-input-loader/snowsight?${params.toString()}`);
     };
 
     const DatabaseIcon = () => (
@@ -524,7 +523,6 @@ function SingleColContent() {
                     <div className={styles.modalContent}>
                         <BaseAIInputLoader
                             variant={variant}
-                            hideButton={true}
                             isTriggered={true}
                             startDelay={500}
                             shouldReset={shouldReset}

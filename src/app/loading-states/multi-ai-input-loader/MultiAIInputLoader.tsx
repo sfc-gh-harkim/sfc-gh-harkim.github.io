@@ -12,7 +12,16 @@ interface MultiAIInputLoaderProps {
     shouldReset?: boolean;
     count?: number;
     hideTracer?: boolean;
+    selectedDuration?: 'P50' | 'P75' | 'P95';
 }
+
+const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
+    switch (selectedDuration) {
+        case 'P75': return 6000; // 2000 + 4000 additional
+        case 'P95': return 35000; // 2000 + 33000 additional
+        default: return 2000; // Default P50 duration
+    }
+};
 
 export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     onThinkingComplete,
@@ -20,7 +29,8 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     variant = 'looping',
     shouldReset = false,
     count = 5,
-    hideTracer = false
+    hideTracer = false,
+    selectedDuration,
 }) => {
     const [isThinking, setIsThinking] = useState(false);
     const [isOutput, setIsOutput] = useState(false);
@@ -31,7 +41,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     const placeholderSequence = [
         { text: 'Connecting to database', duration: 1000 },
         { text: 'Sampling data', duration: 1500 },
-        { text: 'Generating descriptions', duration: 2000 }
+        { text: 'Generating descriptions', duration: getGeneratingDuration(selectedDuration) }
     ];
 
     const finalTexts = [
@@ -134,7 +144,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                             value={currentPlaceholders[index]}
                             readOnly
                             style={{ 
-                                width: '600px',
+                                width: '440px',
                                 height: '72px', 
                                 resize: 'none',
                                 padding: '16px'
@@ -143,7 +153,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                         {!hideTracer && (
                             <svg
                                 className={`${aiStyles.thinkingOutline} ${variant === 'looping' ? (isThinking ? aiStyles.thinking : '') : ''} ${isOutput ? aiStyles.output : ''}`}
-                                width={600}
+                                width={440}
                                 height={72}
                             >
                                 <defs>
@@ -170,21 +180,21 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                                 </defs>
                                 <rect
                                     className={aiStyles.outlinePath}
-                                    width={600}
+                                    width={440}
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                                 <rect
                                     className={aiStyles.basePath}
-                                    width={600}
+                                    width={440}
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                                 <rect
                                     className={aiStyles.gradientPath}
-                                    width={600}
+                                    width={440}
                                     height={72}
                                     rx="6"
                                     ry="6"

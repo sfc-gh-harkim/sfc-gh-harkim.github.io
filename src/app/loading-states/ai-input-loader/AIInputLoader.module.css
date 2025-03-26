@@ -1,3 +1,8 @@
+.container {
+    width: 100%;
+    max-width: 440px;
+}
+
 .inputContainer {
     width: 100%;
     max-width: 100%;
@@ -63,7 +68,7 @@
 /* Default state - initial text area */
 .styledInput {
     overflow: hidden;
-    width: 440px;
+    width: 100%;
     padding: 24px;
     padding-top: 52px;
     font-size: 14px;

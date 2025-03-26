@@ -2,37 +2,45 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './AIInputLoader.module.css';
-import docStyles from '@/app/styles/documentation.module.css';
 import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
 
 export interface BaseAIInputLoaderProps {
     onThinkingComplete?: () => void;
+    onGenerateClick?: () => void;
     width?: number;
     height?: number;
     isTriggered?: boolean;
-    hideButton?: boolean;
     startDelay?: number;
-    variant: 'looping' | 'shimmer';
+    variant: 'looping' | 'shimmer' | 'combined';
     shouldReset?: boolean;
+    selectedDuration?: 'P50' | 'P75' | 'P95';
 }
+
+const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
+    switch (selectedDuration) {
+        case 'P75': return 6000; // 2000 + 4000 additional
+        case 'P95': return 35000; // 2000 + 33000 additional
+        default: return 2000; // Default P50 duration
+    }
+};
 
 const placeholderSequence = [
     { text: "Connecting to database", duration: 1000 },
-    { text: "Sampling data", duration: 2000 },
-    { text: "Generating description", duration: 2000 }
+    { text: "Sampling data", duration: 2000 }
 ];
 
 const FINAL_TEXT = "Size of wheels being placed on bikes within the store inventory";
 
 export function BaseAIInputLoader({
     onThinkingComplete,
+    onGenerateClick,
     width = 440,
     height = 120,
     isTriggered = false,
-    hideButton = false,
     startDelay = 0,
     variant = 'looping',
-    shouldReset = false
+    shouldReset = false,
+    selectedDuration
 }: BaseAIInputLoaderProps) {
     const [isThinking, setIsThinking] = useState(false);
     const [isOutput, setIsOutput] = useState(false);
@@ -90,20 +98,23 @@ export function BaseAIInputLoader({
         // Don't proceed if already in thinking or output state
         if (isThinking || isOutput) return;
 
+        onGenerateClick?.();
         setIsThinking(true);
         setCurrentPlaceholder("");
         setStatusText(placeholderSequence[0].text);
         const ellipsisInterval = animateEllipsis();
         
         try {
-            // Skip the first status text since we've already set it
-            for (let i = 1; i < placeholderSequence.length; i++) {
-                const step = placeholderSequence[i];
+            // Go through initial states
+            for (const step of placeholderSequence) {
                 await new Promise(resolve => setTimeout(resolve, step.duration));
                 setStatusText(step.text);
             }
 
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            // Set the "Generating description" state with dynamic duration
+            setStatusText("Generating description");
+            await new Promise(resolve => setTimeout(resolve, getGeneratingDuration(selectedDuration)));
+
             clearInterval(ellipsisInterval);
             setIsThinking(false);
             setIsOutput(true);
@@ -153,7 +164,7 @@ export function BaseAIInputLoader({
                     style={{ width, height, resize: 'none' }}
                 />
                 <svg
-                    className={`${styles.thinkingOutline} ${(variant === 'looping' && isThinking) ? styles.thinking : ''} ${isOutput ? styles.output : ''}`}
+                    className={`${styles.thinkingOutline} ${((variant === 'looping' || variant === 'combined') && isThinking) ? styles.thinking : ''} ${isOutput ? styles.output : ''}`}
                     width={width}
                     height={height}
                 >
@@ -204,59 +215,16 @@ export function BaseAIInputLoader({
                         <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
                     </div>
                 )}
+                {variant === 'combined' && (
+                    <div 
+                        className={styles.skeletonContainer}
+                        style={{ opacity: isThinking && !isOutput ? 1 : 0, transition: 'opacity 0.3s ease' }}
+                    >
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                    </div>
+                )}
             </div>
-            {!hideButton && (
-                <div className={docStyles.buttonContainer}>
-                    <a
-                        href={`/loading-states/ai-input-loader/in-situ?variant=${variant}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={docStyles.viewButton}
-                    >
-                        Single Col
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={docStyles.externalIcon}
-                        >
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                    </a>
-                    <a
-                        href={`/loading-states/ai-input-loader/in-situ?variant=${variant}&tab=details`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={docStyles.viewButton}
-                    >
-                        Single Object
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={docStyles.externalIcon}
-                        >
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                    </a>
-                </div>
-            )}
         </div>
     );
 } 

@@ -18,8 +18,7 @@ const sidebarItems: SidebarItem[] = [
     title: 'Loading States',
     href: '/loading-states',
     children: [
-      { title: 'AI Input Loader (Looping)', href: '/loading-states/ai-input-loader-looping' },
-      { title: 'AI Input Loader (Shimmer)', href: '/loading-states/ai-input-loader-shimmer' },
+      { title: 'AI Input Loader', href: '/loading-states/ai-input-loader' },
       { title: 'Multi AI Input Loader', href: '/loading-states/multi-ai-input-loader' },
     ],
   },
@@ -44,7 +43,7 @@ export function Sidebar() {
   const normalizedPathname = normalizePath(pathname);
 
   return (
-    <aside className="w-72 h-screen fixed left-0 top-0 overflow-y-auto font-plus-jakarta-sans z-50">
+    <aside className="w-72 h-screen fixed left-0 top-0 overflow-y-auto font-plus-jakarta-sans z-50 hidden xl:block">
       <div className="p-8">
         <Link href="/" className="text-[32px] leading-[40px] font-semibold text-gray-100 hover:text-gray-300">
           DesignLab
