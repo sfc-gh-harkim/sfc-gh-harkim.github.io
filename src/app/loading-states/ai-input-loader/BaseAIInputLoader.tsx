@@ -84,7 +84,15 @@ export function BaseAIInputLoader({
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
-        if (isTriggered && !isThinking && !isOutput) {
+        if (isTriggered) {
+            if (isOutput) {
+                // Reset states if already completed
+                setIsThinking(false);
+                setIsOutput(false);
+                setCurrentPlaceholder("");
+                setStatusText("");
+                setEllipsis('');
+            }
             timer = setTimeout(() => {
                 toggleThinking();
             }, startDelay);
@@ -92,23 +100,60 @@ export function BaseAIInputLoader({
         return () => {
             if (timer) clearTimeout(timer);
         };
-    }, [isTriggered, isThinking, isOutput]);
+    }, [isTriggered]);
 
     const toggleThinking = async () => {
-        // Don't proceed if already in thinking or output state
-        if (isThinking || isOutput) return;
+        // Reset states if already completed
+        if (isOutput) {
+            setIsThinking(false);
+            setIsOutput(false);
+            setCurrentPlaceholder("");
+            setStatusText("");
+            setEllipsis('');
+            // Start the animation again
+            onGenerateClick?.();
+            setIsThinking(true);
+            const ellipsisInterval = animateEllipsis();
+            
+            try {
+                // Go through initial states
+                for (const step of placeholderSequence) {
+                    setStatusText(step.text);
+                    await new Promise(resolve => setTimeout(resolve, step.duration));
+                }
+
+                // Set the "Generating description" state with dynamic duration
+                setStatusText("Generating description");
+                await new Promise(resolve => setTimeout(resolve, getGeneratingDuration(selectedDuration)));
+
+                clearInterval(ellipsisInterval);
+                setIsThinking(false);
+                setIsOutput(true);
+                setEllipsis('');
+                setStatusText("Cortex-Generated");
+                await typeText(FINAL_TEXT);
+                onThinkingComplete?.();
+            } catch {
+                clearInterval(ellipsisInterval);
+                setIsThinking(false);
+                setIsOutput(false);
+            }
+            return;
+        }
+
+        // Don't proceed if already in thinking state
+        if (isThinking) return;
 
         onGenerateClick?.();
         setIsThinking(true);
         setCurrentPlaceholder("");
-        setStatusText(placeholderSequence[0].text);
         const ellipsisInterval = animateEllipsis();
         
         try {
             // Go through initial states
             for (const step of placeholderSequence) {
-                await new Promise(resolve => setTimeout(resolve, step.duration));
                 setStatusText(step.text);
+                await new Promise(resolve => setTimeout(resolve, step.duration));
             }
 
             // Set the "Generating description" state with dynamic duration
@@ -133,7 +178,7 @@ export function BaseAIInputLoader({
         <div className={styles.container}>
             <div className={styles.inputContainer} style={{ width, height }}>
                 <div className={styles.statusTextContainer}>
-                    {(!isThinking && !isOutput && !isTriggered) ? (
+                    {(!isThinking && !isOutput) ? (
                         <span className={`${styles.statusText} ${styles.resting}`}>
                             Write a description or{' '}
                             <button 

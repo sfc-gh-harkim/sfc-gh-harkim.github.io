@@ -63,7 +63,16 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     }, [shouldReset, count]);
 
     useEffect(() => {
-        if (isTriggered && !isThinking && !isOutput) {
+        if (isTriggered) {
+            if (isOutput) {
+                // Reset states if already completed
+                setIsThinking(false);
+                setIsOutput(false);
+                setIsFadingOut(false);
+                setCurrentPlaceholders(Array(count).fill(''));
+                setStatusText('Connecting to database');
+            }
+            // Start the animation
             setIsThinking(true);
             animatePlaceholders();
         }
