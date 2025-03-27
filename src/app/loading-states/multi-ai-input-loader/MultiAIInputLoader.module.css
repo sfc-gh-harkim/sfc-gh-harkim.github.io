@@ -170,8 +170,9 @@
 }
 
 .thinkingOutline.thinking .gradientPath {
+    display: none;
     stroke-width: 6;
-    animation: trace-outline 3s linear infinite;
+    /* animation: trace-outline 3s linear infinite; */
     opacity: 1;
 }
 

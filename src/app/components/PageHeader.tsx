@@ -22,7 +22,7 @@ export function PageHeader({
         : "text-[28px] leading-[35px] font-semibold text-gray-100 font-plus-jakarta-sans";
     const descriptionClasses = isHomePage
         ? `mt-8 text-white/80 sm:text-lg md:text-xl text-center max-w-3xl mx-auto font-plus-jakarta-sans`
-        : `mt-3 text-gray-400 text-[16px] leading-[24px] ${centered ? 'max-w-3xl mx-auto' : ''} font-plus-jakarta-sans`;
+        : `mt-3 text-[var(--color-text-primary)] text-[24px] leading-[180%] ${centered ? 'max-w-3xl mx-auto' : ''} font-plus-jakarta-sans`;
 
     return (
         <div className={`font-plus-jakarta-sans ${className}`}>

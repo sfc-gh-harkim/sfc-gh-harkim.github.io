@@ -9,7 +9,7 @@ export default function AvatarPage() {
         <ProjectPageTemplate>
             <PageHeader 
                 title="Avatar" 
-                description="A versatile avatar component that supports various states, sizes, and expressions. This component is designed to be used in a variety of contexts, including chat interfaces, user profiles, and more."
+                description="A versatile avatar component that supports various states, sizes, and expressions. This component is designed to be used in a variety of contexts, including Snowsight processes, AI generative tools, and Snowflake Intelligence."
             />
         </ProjectPageTemplate>
     );

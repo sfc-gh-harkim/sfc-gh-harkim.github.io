@@ -110,9 +110,15 @@
     height: 100vh;
     background-color: var(--color-background-tertiary);
     padding: 40px 24px;
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow-y: auto;
+}
+
+@media (min-width: 1280px) {
+    .controlBar {
+        display: flex;
+    }
 }
 
 .controlHeader {
