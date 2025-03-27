@@ -136,7 +136,7 @@
 }
 
 .themeToggle {
-    background: none;
+    background: var(--color-background-action-secondary);
     border: none;
     padding: 8px;
     cursor: pointer;
@@ -145,11 +145,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    width: 36px;
+    height: 36px;
 }
 
 .themeToggle:hover {
-    background-color: var(--color-background-secondary);
+    background: var(--color-background-action-hover);
 }
 
 .themeToggle:active {
