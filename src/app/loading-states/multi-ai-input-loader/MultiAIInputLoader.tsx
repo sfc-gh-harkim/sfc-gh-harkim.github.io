@@ -34,9 +34,19 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     const [isFadingOut, setIsFadingOut] = useState(false);
     const [currentPlaceholders, setCurrentPlaceholders] = useState<string[]>(Array(count).fill(''));
     const [statusText, setStatusText] = useState('Connecting to database');
+    const [ellipsis, setEllipsis] = useState('');
     
     // Generate unique IDs for this instance
     const instanceId = React.useId();
+
+    const animateEllipsis = () => {
+        let count = 0;
+        const interval = setInterval(() => {
+            count = (count + 1) % 4;
+            setEllipsis(count === 0 ? '' : '.'.repeat(count));
+        }, 300);
+        return interval;
+    };
 
     const placeholderSequence = [
         { text: 'Connecting to database', duration: 1000 },
@@ -59,6 +69,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
             setIsFadingOut(false);
             setCurrentPlaceholders(Array(count).fill(''));
             setStatusText('Connecting to database');
+            setEllipsis('');
         }
     }, [shouldReset, count]);
 
@@ -71,12 +82,21 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                 setIsFadingOut(false);
                 setCurrentPlaceholders(Array(count).fill(''));
                 setStatusText('Connecting to database');
+                setEllipsis('');
             }
             // Start the animation
             setIsThinking(true);
+            const ellipsisInterval = animateEllipsis();
             animatePlaceholders();
+            return () => clearInterval(ellipsisInterval);
         }
     }, [isTriggered]);
+
+    useEffect(() => {
+        if (isThinking && !isOutput) {
+            setStatusText(statusText.replace(/\.+$/, '') + ellipsis);
+        }
+    }, [ellipsis, isThinking, isOutput, statusText]);
 
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
