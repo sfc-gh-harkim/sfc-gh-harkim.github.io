@@ -45,7 +45,7 @@ export function Sidebar() {
   return (
     <aside className="w-72 h-screen fixed left-0 top-0 overflow-y-auto font-plus-jakarta-sans z-50 hidden xl:block">
       <div className="p-8">
-        <Link href="/" className="text-[32px] leading-[40px] font-semibold text-gray-100 hover:text-gray-300">
+        <Link href="/" className="text-[32px] leading-[40px] font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-text-secondary)]">
           DesignLab
         </Link>
         <nav className="mt-8 space-y-4">
@@ -55,8 +55,8 @@ export function Sidebar() {
                 href={item.href}
                 className={
                   normalizedPathname === normalizePath(item.href)
-                    ? "block text-sm text-white font-bold"
-                    : "block text-sm text-white/80 hover:text-white"
+                    ? "block text-sm text-[var(--color-text-primary)] font-bold"
+                    : "block text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
                 }
               >
                 {item.title}
@@ -69,8 +69,8 @@ export function Sidebar() {
                       href={child.href}
                       className={
                         normalizedPathname === normalizePath(child.href)
-                          ? "block text-sm text-white font-bold"
-                          : "block text-sm text-white/80 hover:text-white"
+                          ? "block text-sm text-[var(--color-text-primary)] font-bold"
+                          : "block text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
                       }
                     >
                       {child.title}

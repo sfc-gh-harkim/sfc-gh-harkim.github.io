@@ -1,0 +1,61 @@
+:root {
+    /* Component Background Colors */
+    --balto-background-primary: #1f2937;
+    --balto-background-secondary: #1D252F;
+    --balto-background-tertiary: #293246;
+    
+    /* Component Text Colors */
+    --balto-text-primary: #f3f4f6;
+    --balto-text-secondary: #BDC4D5;
+    --balto-text-tertiary: #9ca3af;
+    
+    /* Component Border Colors */
+    --balto-border-primary: #293246;
+    --balto-border-secondary: rgba(255, 255, 255, 0.1);
+    
+    /* Component Gradient Colors */
+    --balto-gradient-primary-start: #2986E8;
+    --balto-gradient-primary-middle: #90E0FD;
+    --balto-gradient-primary-end: #11C5CF;
+    
+    /* Component Glow Colors */
+    --balto-glow-primary: rgba(16, 159, 212, 0.24);
+    --balto-glow-secondary: rgba(13, 141, 150, 0.24);
+    --balto-glow-active: rgba(1, 116, 255, 0.24);
+    --balto-glow-active-secondary: rgba(20, 165, 187, 0.24);
+    
+    /* Component Skeleton Colors */
+    --balto-skeleton-start: rgba(0, 0, 0, 0.08);
+    --balto-skeleton-middle: rgba(0, 0, 0, 0.16);
+    --balto-skeleton-end: rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode variables for components */
+[data-theme="light"] {
+    --balto-background-primary: #ffffff;
+    --balto-background-secondary: #fbfbfb;
+    --balto-background-tertiary: #e5e7eb;
+    
+    --balto-text-primary: #1e252f;
+    --balto-text-secondary: #5d6a85;
+    --balto-text-tertiary: #6b7280;
+    
+    --balto-border-primary: #D5DAE4;
+    --balto-border-secondary: rgba(0, 0, 0, 0.1);
+    
+    /* Keep gradient colors the same for now */
+    --balto-gradient-primary-start: #2986E8;
+    --balto-gradient-primary-middle: #90E0FD;
+    --balto-gradient-primary-end: #11C5CF;
+    
+    /* Adjust glow colors for light mode */
+    --balto-glow-primary: rgba(16, 159, 212, 0.12);
+    --balto-glow-secondary: rgba(13, 141, 150, 0.12);
+    --balto-glow-active: rgba(1, 116, 255, 0.12);
+    --balto-glow-active-secondary: rgba(20, 165, 187, 0.12);
+    
+    /* Adjust skeleton colors for light mode */
+    --balto-skeleton-start: rgba(255, 255, 255, 0.04);
+    --balto-skeleton-middle: rgba(255, 255, 255, 0.08);
+    --balto-skeleton-end: rgba(255, 255, 255, 0.04);
+} 

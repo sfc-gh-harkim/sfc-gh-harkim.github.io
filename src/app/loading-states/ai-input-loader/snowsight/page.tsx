@@ -4,7 +4,7 @@ import { BaseAIInputLoader } from '../BaseAIInputLoader';
 import { MultiAIInputLoader } from '../../multi-ai-input-loader/MultiAIInputLoader';
 import styles from './page.module.css';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useRef, useEffect } from 'react';
 import Image from 'next/image';
 
 type ExpandedItems = {
@@ -15,6 +15,14 @@ function TableDetailsTab() {
     const searchParams = useSearchParams();
     const variant = searchParams.get('variant') as 'looping' | 'shimmer' || 'looping';
     const [isThinking, setIsThinking] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [containerWidth, setContainerWidth] = useState(1200);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            setContainerWidth(containerRef.current.offsetWidth);
+        }
+    }, []);
 
     const handleGenerateClick = () => {
         setIsThinking(true);
@@ -36,11 +44,11 @@ function TableDetailsTab() {
                     className={`${styles.descriptionBox} ${isThinking ? styles.expanded : ''}`}
                     onClick={handleGenerateClick}
                 >
-                    <div className={styles.sectionContent}>
+                    <div className={styles.sectionContent} ref={containerRef}>
                         <h3 className={styles.detailsTitle}>Description</h3>
                         <BaseAIInputLoader 
                             variant={variant}  
-                            width={1000}
+                            width={containerWidth}
                             height={isThinking ? 120 : 80}
                             isTriggered={isThinking}
                             startDelay={0}

@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import { ProjectPageTemplate } from '@/app/layouts/ProjectPageTemplate';
 import { MultiAIInputLoader } from './MultiAIInputLoader';
-import { ControlBar } from '@/app/components/ControlBar';
-import styles from '@/app/styles/documentation.module.css';
-import controlStyles from '@/app/components/ControlBar.module.css';
+import { ControlBar } from '@/app/layouts/ControlBar';
+import styles from '@/app/styles/designlab.module.css';
 
 export default function MultiAIInputLoaderPage() {
     const [activeValue, setActiveValue] = useState<'P50' | 'P75' | 'P95'>('P50');
@@ -34,8 +33,8 @@ export default function MultiAIInputLoaderPage() {
                 </div>
             </ProjectPageTemplate>
             <ControlBar>
-                <div className={controlStyles.section}>
-                    <h3 className={controlStyles.sectionTitle}>Length</h3>
+                <div className={styles.controlSection}>
+                    <h3 className={styles.controlSectionTitle}>Length</h3>
                     <div className={styles.tabGroup}>
                         <button
                             className={`${styles.tab} ${activeValue === 'P50' ? styles.active : ''}`}
@@ -58,7 +57,7 @@ export default function MultiAIInputLoaderPage() {
                     </div>
                 </div>
 
-                <div className={controlStyles.buttonContainer}>
+                <div className={styles.controlButtonContainer}>
                     <button
                         className={`${styles.viewButton} w-full`}
                         onClick={handleGenerateClick}
@@ -66,7 +65,7 @@ export default function MultiAIInputLoaderPage() {
                     >
                         Play
                     </button>
-                    <div className={controlStyles.buttonGroup}>
+                    <div className={styles.controlButtonGroup}>
                         <a
                             href={`/loading-states/ai-input-loader/snowsight?tab=columns`}
                             target="_blank"

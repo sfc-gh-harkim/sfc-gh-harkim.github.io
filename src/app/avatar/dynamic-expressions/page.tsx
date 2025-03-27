@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { ProjectPageTemplate } from '../../layouts/ProjectPageTemplate';
 import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
 import styles from './page.module.css';
-import docStyles from '@/app/styles/documentation.module.css';
+import designStyles from '@/app/styles/designlab.module.css';
 
 export default function DynamicExpressionsPage() {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -41,29 +41,29 @@ export default function DynamicExpressionsPage() {
                         isStopping={isStopping}
                         onComplete={handleComplete}
                     />
-                    <div className={docStyles.buttonContainer}>
+                    <div className={designStyles.buttonContainer}>
                         <button 
                             onClick={handleThinking}
-                            className={docStyles.viewButton}
+                            className={designStyles.viewButton}
                             disabled={isPlaying}
                         >
                             Thinking
                         </button>
                         <button 
-                            className={docStyles.viewButton}
+                            className={designStyles.viewButton}
                             disabled={true}
                         >
                             Caution
                         </button>
                         <button 
-                            className={docStyles.viewButton}
+                            className={designStyles.viewButton}
                             disabled={true}
                         >
                             Idle
                         </button>
                         <button 
                             onClick={handleStop}
-                            className={docStyles.viewButton}
+                            className={designStyles.viewButton}
                             disabled={!isPlaying || isStopping}
                         >
                             Stop

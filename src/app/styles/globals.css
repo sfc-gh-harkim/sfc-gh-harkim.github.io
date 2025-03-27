@@ -3,70 +3,81 @@
 @tailwind utilities;
 
 :root {
-  /* Colors */
-  --color-background-primary: #111827;
-  --color-background-secondary: #1f2937;
-  --color-background-tertiary: #1E252F;
-  --color-background-input: #1D252F;
-
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #F3F4F6;
-  --color-text-tertiary: #D1D5DB;
-  --color-text-muted: #9CA3AF;
-  --color-text-status: #BDC4D5;
-
-  --color-border-primary: #293246;
-  --color-border-secondary: #374151;
-
-  --color-brand-primary: #2986E8;
-  --color-brand-hover: #2476D1;
-
-  /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-plus-jakarta-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-
-  /* Spacing */
-  --spacing-sidebar-width: 18rem;
-  --spacing-sidebar-padding: 2rem;
-  --spacing-container-padding-x: 2rem;
-  --spacing-container-padding-y: 3rem;
-
-  /* Animation */
-  --transition-fast: 0.2s ease;
-  --transition-base: 0.3s ease;
-  --transition-slow: 0.5s ease;
-
-  /* Shadows */
-  --shadow-modal: 0px 4px 16px 0px rgba(0, 0, 0, 0.30);
-  --shadow-input: -32px -32px 60px 0px rgba(16, 159, 212, 0.12) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.12) inset;
-
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-base: 6px;
-  --radius-lg: 8px;
+    /* Documentation Background Colors */
+    --color-background-primary: #111827;
+    --color-background-secondary: #1f2937;
+    --color-background-tertiary: rgba(0, 0, 0, 0.08);
+    --color-background-action-primary: #ffffff;
+    --color-background-action-secondary: rgba(255, 255, 255, 0.08);
+    --color-background-action-hover: rgba(255, 255, 255, 0.16);
+    
+    /* Documentation Text Colors */
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #F3F4F6;
+    --color-text-tertiary: #D1D5DB;
+    --color-text-inverse: #000000;
+    --color-text-muted: #9CA3AF;
+    --color-text-status: #BDC4D5;
+    
+    /* Documentation Border Colors */
+    --color-border-primary: #293246;
+    --color-border-secondary: #374151;
+    
+    /* Documentation Brand Colors */
+    --color-brand-primary: #2986E8;
+    --color-brand-hover: #2476D1;
+    
+    /* Documentation Typography */
+    --font-family-base: 'Plus Jakarta Sans', sans-serif;
+    --font-family-mono: 'JetBrains Mono', monospace;
+    
+    /* Documentation Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Documentation Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    /* Documentation Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-@theme inline {
-  --color-background: var(--color-background-primary);
-  --color-foreground: var(--color-text-primary);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+/* Light mode variables for documentation */
+[data-theme="light"] {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f3f4f6;
+    --color-background-tertiary: rgba(0, 0, 0, 0.02);
+    --color-background-action-primary: #111827;
+    --color-background-action-secondary: rgba(0, 0, 0, 0.08);
+    --color-background-action-hover: rgba(0, 0, 0, 0.12);
+    
+    --color-text-primary: #111827;
+    --color-text-secondary: #4b5563;
+    --color-text-tertiary: #6b7280;
+    --color-text-inverse: #ffffff;
+    --color-text-muted: #9ca3af;
+    --color-text-status: #4b5563;
+    
+    --color-border-primary: #e5e7eb;
+    --color-border-secondary: #d1d5db;
+    
+    --color-brand-primary: #2986E8;
+    --color-brand-hover: #2476D1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background-primary: #0a0a0a;
-    --color-text-primary: #ededed;
-  }
-}
-
+/* Base styles */
 body {
-  color: var(--color-text-primary);
-  background-color: var(--color-background-primary);
-  font-family: var(--font-plus-jakarta-sans);
-  transition: background-color 2s ease;
-}
-
-main {
-  min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-base);
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    min-height: 100vh;
 }

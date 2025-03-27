@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import { ProjectPageTemplate } from '@/app/layouts/ProjectPageTemplate';
 import { BaseAIInputLoader } from './BaseAIInputLoader';
-import { ControlBar } from '@/app/components/ControlBar';
-import styles from '@/app/styles/documentation.module.css';
-import controlStyles from '@/app/components/ControlBar.module.css';
+import { ControlBar } from '@/app/layouts/ControlBar';
+import styles from '@/app/styles/designlab.module.css';
 
 type Variant = 'looping' | 'shimmer' | 'combined';
 
@@ -39,8 +38,8 @@ export default function AIInputLoaderPage() {
                 </div>
             </ProjectPageTemplate>
             <ControlBar>
-                <div className={controlStyles.section}>
-                    <h3 className={controlStyles.sectionTitle}>Variant</h3>
+                <div className={styles.controlSection}>
+                    <h3 className={styles.controlSectionTitle}>Variant</h3>
                     <div className={styles.tabGroup}>
                         <button
                             className={`${styles.tab} ${activeVariant === 'looping' ? styles.active : ''}`}
@@ -63,8 +62,8 @@ export default function AIInputLoaderPage() {
                     </div>
                 </div>
 
-                <div className={controlStyles.section}>
-                    <h3 className={controlStyles.sectionTitle}>Length</h3>
+                <div className={styles.controlSection}>
+                    <h3 className={styles.controlSectionTitle}>Length</h3>
                     <div className={styles.tabGroup}>
                         <button
                             className={`${styles.tab} ${activeValue === 'P50' ? styles.active : ''}`}
@@ -87,7 +86,7 @@ export default function AIInputLoaderPage() {
                     </div>
                 </div>
 
-                <div className={controlStyles.buttonContainer}>
+                <div className={styles.controlButtonContainer}>
                     <button
                         className={`${styles.viewButton} w-full`}
                         onClick={handleGenerateClick}
@@ -95,7 +94,7 @@ export default function AIInputLoaderPage() {
                     >
                         Play
                     </button>
-                    <div className={controlStyles.buttonGroup}>
+                    <div className={styles.controlButtonGroup}>
                         <a
                             href={`/loading-states/ai-input-loader/snowsight?tab=columns&variant=${activeVariant}`}
                             target="_blank"
@@ -121,7 +120,7 @@ export default function AIInputLoaderPage() {
                             </svg>
                         </a>
                         <a
-                            href={`/loading-states/ai-input-loader/snowsight?tab=object&variant=${activeVariant}`}
+                            href={`/loading-states/ai-input-loader/snowsight?tab=details&variant=${activeVariant}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.viewButton}

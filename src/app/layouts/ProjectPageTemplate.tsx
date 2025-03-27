@@ -1,23 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Sidebar } from './Sidebar';
 import { usePathname } from 'next/navigation';
-import styles from '@/app/styles/documentation.module.css';
+import styles from '@/app/styles/designlab.module.css';
 
 interface ProjectPageTemplateProps {
     children: React.ReactNode;
-    showTabs?: boolean;
-    activeTab?: string;
-    onTabChange?: (tab: string) => void;
 }
 
 export function ProjectPageTemplate({ 
-    children, 
-    showTabs = false,
-    activeTab,
-    onTabChange 
+    children
 }: ProjectPageTemplateProps) {
     const pathname = usePathname();
     const isHomePage = pathname === '/';
+
+    useEffect(() => {
+        if (isHomePage) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    }, [isHomePage]);
     
     // Get the page title from the pathname
     const getPageTitle = () => {
@@ -44,38 +44,16 @@ export function ProjectPageTemplate({
     const pageTitle = getPageTitle();
     
     return (
-        <div className={`min-h-screen flex transition-colors duration-300 ${isHomePage ? 'bg-[#0080c2]' : 'bg-gray-900'}`}>
+        <div className={`min-h-screen flex transition-colors duration-300 ${isHomePage ? 'bg-[#0080c2]' : 'bg-[var(--color-background-primary)]'}`}>
             <Sidebar />
             <main className="flex-1 min-h-screen">
                 <div className="w-full max-w-[800px] mx-auto px-8 py-9">
                     <div className={`${!isHomePage ? 'font-inter' : ''}`}>
                         {!isHomePage && pageTitle && (
                             <>
-                                <h2 className="text-[28px] leading-[35px] font-semibold text-gray-100 font-plus-jakarta-sans">
+                                <h2 className="text-[28px] leading-[35px] font-semibold text-[var(--color-text-primary)] font-plus-jakarta-sans">
                                     {pageTitle}
                                 </h2>
-                                {showTabs && (
-                                    <div className={styles.tabGroup}>
-                                        <button
-                                            className={`${styles.tab} ${activeTab === 'looping' ? styles.active : ''}`}
-                                            onClick={() => onTabChange?.('looping')}
-                                        >
-                                            Looping
-                                        </button>
-                                        <button
-                                            className={`${styles.tab} ${activeTab === 'shimmer' ? styles.active : ''}`}
-                                            onClick={() => onTabChange?.('shimmer')}
-                                        >
-                                            Shimmer
-                                        </button>
-                                        <button
-                                            className={`${styles.tab} ${activeTab === 'combined' ? styles.active : ''}`}
-                                            onClick={() => onTabChange?.('combined')}
-                                        >
-                                            Combined
-                                        </button>
-                                    </div>
-                                )}
                             </>
                         )}
                         <div className={styles.mainContent}>

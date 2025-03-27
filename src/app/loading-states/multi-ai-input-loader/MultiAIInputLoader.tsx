@@ -153,7 +153,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                             value={currentPlaceholders[index]}
                             readOnly
                             style={{ 
-                                width: '440px',
+                                width: '100%',
                                 height: '72px', 
                                 resize: 'none',
                                 padding: '16px'
@@ -162,7 +162,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                         {!hideTracer && (
                             <svg
                                 className={`${aiStyles.thinkingOutline} ${variant === 'looping' ? (isThinking ? aiStyles.thinking : '') : ''} ${isOutput ? aiStyles.output : ''}`}
-                                width={440}
+                                width="100%"
                                 height={72}
                             >
                                 <defs>
@@ -189,21 +189,21 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                                 </defs>
                                 <rect
                                     className={aiStyles.outlinePath}
-                                    width={440}
+                                    width="100%"
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                                 <rect
                                     className={aiStyles.basePath}
-                                    width={440}
+                                    width="100%"
                                     height={72}
                                     rx="6"
                                     ry="6"
                                 />
                                 <rect
                                     className={aiStyles.gradientPath}
-                                    width={440}
+                                    width="100%"
                                     height={72}
                                     rx="6"
                                     ry="6"

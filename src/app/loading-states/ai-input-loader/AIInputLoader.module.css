@@ -1,6 +1,5 @@
 .container {
     width: 100%;
-    max-width: 440px;
 }
 
 .inputContainer {
@@ -35,7 +34,7 @@
 .statusText {
     font-size: 12px;
     line-height: 16px;
-    color: #BDC4D5;
+    color: var(--balto-text-secondary);
     font-weight: 500;
     text-transform: uppercase;
 }
@@ -43,14 +42,14 @@
 .statusText.resting {
     font-size: 14px;
     line-height: 20px;
-    color: #f3f4f6;
+    color: var(--balto-text-primary);
     text-transform: none;
 }
 
 .generateButton {
     font-size: 14px;
     line-height: 20px;
-    color: #f3f4f6;
+    color: var(--balto-text-primary);
     font-weight: 500;
     text-decoration: underline;
     background: none;
@@ -62,7 +61,7 @@
 }
 
 .generateButton:hover {
-    color: #ffffff;
+    color: var(--balto-text-primary);
 }
 
 /* Default state - initial text area */
@@ -73,14 +72,14 @@
     padding-top: 52px;
     font-size: 14px;
     line-height: 20px;
-    border: 1px solid #293246;
+    border: 1px solid var(--balto-border-primary);
     border-radius: 6px;
-    background-color: #1f2937;
+    background: var(--balto-background-secondary);
     transition: all 0.3s ease;
     box-shadow: none;
     outline: none;
     position: relative;
-    color: #f3f4f6;
+    color: var(--balto-text-primary);
     box-sizing: border-box;
     height: 120px;
     vertical-align: top;
@@ -88,13 +87,13 @@
 }
 
 .styledInput::placeholder {
-    color: #9ca3af;
+    color: var(--balto-text-tertiary);
 }
 
 /* Thinking state - during animation */
 .styledInput.thinking {
     border: 1px solid transparent;
-    background: #1D252F;
+    background: var(--balto-background-secondary);
     animation: fade-in-shadow 0.3s ease forwards, pulse-shadow 3s ease-in-out infinite 0.3s;
 }
 
@@ -103,24 +102,24 @@
         box-shadow: none;
     }
     to {
-        box-shadow: -24px -24px 60px 0px rgba(16, 159, 212, 0.24) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.24) inset;
+        box-shadow: -24px -24px 60px 0px var(--balto-glow-primary) inset, 32px 32px 80px 0px var(--balto-glow-secondary) inset;
     }
 }
 
 @keyframes pulse-shadow {
     0%, 100% {
-        box-shadow: -24px -24px 60px 0px rgba(16, 159, 212, 0.24) inset, 32px 32px 80px 0px rgba(13, 141, 150, 0.24) inset;
+        box-shadow: -24px -24px 60px 0px var(--balto-glow-primary) inset, 32px 32px 80px 0px var(--balto-glow-secondary) inset;
     }
     50% {
-        box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
+        box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
     }
 }
 
 /* Output state - after animation completes */
 .styledInput.output {
     border: 1px solid transparent;
-    background: #1D252F;
-    box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
+    background: var(--balto-background-secondary);
+    box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
     animation: fade-out-glow 3s ease forwards;
 }
 
@@ -146,14 +145,14 @@
     stroke-dasharray: 92 1280;
     stroke-dashoffset: 1360;
     transition: none;
-    filter: drop-shadow(0 0 2px rgba(16, 159, 212, 0.12));
+    filter: drop-shadow(0 0 2px var(--balto-glow-primary));
     opacity: 0.3;
 }
 
 /* Base border for thinking state */
 .basePath {
     fill: none;
-    stroke: #29B5E8;
+    stroke: var(--balto-gradient-primary-start);
     stroke-width: 4;
     stroke-linecap: round;
     opacity: 0.3;
@@ -228,14 +227,14 @@
 
 @keyframes fade-out-glow {
     0% {
-        box-shadow: -32px -32px 120px 0px rgba(1, 116, 255, 0.24) inset, 32px 32px 120px 0px rgba(20, 165, 187, 0.24) inset;
-        background: #1D252F;
+        box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
+        background: var(--balto-background-secondary);
         border: 1px solid transparent;
     }
     100% {
         box-shadow: none;
-        background: #1f2937;
-        border: 1px solid #293246;
+        background: var(--balto-background-primary);
+        border: 1px solid var(--balto-border-primary);
     }
 }
 
@@ -285,6 +284,10 @@
     width: 80%;
 }
 
+.shimmer {
+    animation: shimmer 3s linear infinite;
+}
+
 @keyframes shimmer {
     from {
         background-position: 0% 0;
@@ -292,8 +295,4 @@
     to {
         background-position: -200% 0;
     }
-}
-
-.shimmer {
-    animation: shimmer 3s linear infinite;
 } 

@@ -1,0 +1,191 @@
+.buttonContainer {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.loaderContainer {
+    width: 440px;
+    max-width: 440px;
+}
+
+.viewButton {
+    padding: 12px;
+    background: var(--color-background-action-secondary);
+    color: var(--color-text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.viewButton:hover {
+    background: var(--color-background-action-hover);
+}
+
+.viewButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.externalIcon {
+    transition: transform 0.1s ease;
+}
+
+.viewButton:hover .externalIcon {
+    transform: translate(2px, -2px);
+}
+
+.tabGroup {
+    display: flex;
+    width: 100%;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    background: var(--color-background-action-secondary);
+    border: 1px solid var(--color-border-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.tab:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.tab:not(:last-child) {
+    border-right: none;
+}
+
+.tab:hover {
+    background: var(--color-background-action-hover);
+    color: var(--color-text-secondary);
+}
+
+.tab.active {
+    background: var(--color-background-action-primary);
+    color: var(--color-text-inverse);
+}
+
+.componentControls {
+    margin-top: 32px;
+    padding: 24px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-primary);
+}
+
+.mainContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
+}
+
+/* ControlBar styles */
+.controlBar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 336px;
+    height: 100vh;
+    background-color: var(--color-background-tertiary);
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.controlHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.controlTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.themeToggle {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.themeToggle:hover {
+    background-color: var(--color-background-secondary);
+}
+
+.themeToggle:active {
+    background-color: var(--color-background-primary);
+}
+
+.controlContent {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.controlSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.controlSection:not(:last-child) {
+    margin-bottom: 40px;
+}
+
+.controlSectionTitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.controlButtonGroup {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.controlButtonGroup > * {
+    flex: 1;
+}
+
+.controlButtonContainer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
