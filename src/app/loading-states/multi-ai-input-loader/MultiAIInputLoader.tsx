@@ -11,7 +11,6 @@ interface MultiAIInputLoaderProps {
     count?: number;
     hideTracer?: boolean;
     selectedDuration?: 'P50' | 'P75' | 'P95';
-    variant?: 'looping' | 'shimmer' | 'combined';
 }
 
 const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
@@ -29,7 +28,6 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     count = 5,
     hideTracer = false,
     selectedDuration,
-    variant,
 }) => {
     const [isThinking, setIsThinking] = useState(false);
     const [isOutput, setIsOutput] = useState(false);
@@ -163,7 +161,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                         />
                         {!hideTracer && (
                             <svg
-                                className={`${multiStyles.thinkingOutline} ${((variant === 'looping' || variant === 'combined') && isThinking) ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
+                                className={`${multiStyles.thinkingOutline} ${isThinking ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
                                 width="100%"
                                 height={72}
                             >

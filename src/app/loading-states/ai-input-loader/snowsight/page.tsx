@@ -599,7 +599,6 @@ function SingleColContent() {
                                                 <div style={{ width: '600px', padding: '16px', marginTop: '-48px' }}>
                                                     {isReviewModalVisible && (
                                                         <MultiAIInputLoader
-                                                            variant="combined"
                                                             isTriggered={true}
                                                             hideTracer={true}
                                                         />

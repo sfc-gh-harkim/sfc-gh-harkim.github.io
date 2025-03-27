@@ -110,7 +110,7 @@
     border: 1px solid var(--balto-border-primary);
     background: var(--balto-background-secondary);
     box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
-    animation: fade-out-glow 3s ease forwards;
+    animation: fade-out-glow 1s ease forwards;
 }
 
 /* SVG outline container */
@@ -196,43 +196,43 @@
 
 /* Stagger the fade-out animations */
 .inputWrapper:nth-child(1) .styledInput.output {
-    animation: fade-out-glow 3s ease forwards;
+    animation: fade-out-glow 1s ease forwards;
 }
 
 .inputWrapper:nth-child(2) .styledInput.output {
-    animation: fade-out-glow 3s ease forwards 0.2s;
+    animation: fade-out-glow 1s ease forwards 0.2s;
 }
 
 .inputWrapper:nth-child(3) .styledInput.output {
-    animation: fade-out-glow 3s ease forwards 0.4s;
+    animation: fade-out-glow 1s ease forwards 0.4s;
 }
 
 .inputWrapper:nth-child(4) .styledInput.output {
-    animation: fade-out-glow 3s ease forwards 0.6s;
+    animation: fade-out-glow 1s ease forwards 0.6s;
 }
 
 .inputWrapper:nth-child(5) .styledInput.output {
-    animation: fade-out-glow 3s ease forwards 0.8s;
+    animation: fade-out-glow 1s ease forwards 0.8s;
 }
 
 .inputWrapper:nth-child(1) .thinkingOutline.output .outlinePath {
-    animation: fade-out-border 3s ease forwards;
+    animation: fade-out-border 1s ease forwards;
 }
 
 .inputWrapper:nth-child(2) .thinkingOutline.output .outlinePath {
-    animation: fade-out-border 3s ease forwards 0.2s;
+    animation: fade-out-border 1s ease forwards 0.2s;
 }
 
 .inputWrapper:nth-child(3) .thinkingOutline.output .outlinePath {
-    animation: fade-out-border 3s ease forwards 0.4s;
+    animation: fade-out-border 1s ease forwards 0.4s;
 }
 
 .inputWrapper:nth-child(4) .thinkingOutline.output .outlinePath {
-    animation: fade-out-border 3s ease forwards 0.6s;
+    animation: fade-out-border 1s ease forwards 0.6s;
 }
 
 .inputWrapper:nth-child(5) .thinkingOutline.output .outlinePath {
-    animation: fade-out-border 3s ease forwards 0.8s;
+    animation: fade-out-border 1s ease forwards 0.8s;
 }
 
 @keyframes fade-out-glow {
