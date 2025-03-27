@@ -228,12 +228,10 @@
 @keyframes fade-out-glow {
     0% {
         box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
-        background: var(--balto-background-secondary);
         border: 1px solid transparent;
     }
     100% {
         box-shadow: none;
-        background: var(--balto-background-primary);
         border: 1px solid var(--balto-border-primary);
     }
 }
@@ -265,12 +263,11 @@
     background: linear-gradient(
         90deg,
         rgba(0, 0, 0, 0.08) 0%,
-        rgba(0, 0, 0, 0.16) 20%,
-        rgba(0, 0, 0, 0.16) 35%,
+        rgba(0, 0, 0, 0.12) 20%,
+        rgba(0, 0, 0, 0.12) 35%,
         rgba(0, 0, 0, 0.08) 50%,
-        rgba(0, 0, 0, 0.08) 50%,
-        rgba(0, 0, 0, 0.16) 65%,
-        rgba(0, 0, 0, 0.16) 80%,
+        rgba(0, 0, 0, 0.12) 65%,
+        rgba(0, 0, 0, 0.12) 80%,
         rgba(0, 0, 0, 0.08) 100%
     );
     background-size: 200% 100%;

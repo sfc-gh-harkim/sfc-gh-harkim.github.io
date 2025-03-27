@@ -54,6 +54,207 @@
     width: 100%;
 }
 
+/* Default state - initial text area */
+.styledInput {
+    overflow: hidden;
+    width: 100%;
+    padding: 24px;
+    padding-top: 52px;
+    font-size: 14px;
+    line-height: 20px;
+    border: 1px solid var(--balto-border-primary);
+    border-radius: 6px;
+    background: var(--balto-background-secondary);
+    transition: all 0.3s ease;
+    box-shadow: none;
+    outline: none;
+    position: relative;
+    color: var(--balto-text-primary);
+    box-sizing: border-box;
+    height: 120px;
+    vertical-align: top;
+    font-family: inherit;
+}
+
+.styledInput::placeholder {
+    color: var(--balto-text-tertiary);
+}
+
+/* Thinking state - during animation */
+.styledInput.thinking {
+    border: 1px solid transparent;
+    background: var(--balto-background-secondary);
+    animation: fade-in-shadow 0.3s ease forwards, pulse-shadow 3s ease-in-out infinite 0.3s;
+}
+
+@keyframes fade-in-shadow {
+    from {
+        box-shadow: none;
+    }
+    to {
+        box-shadow: -24px -24px 60px 0px var(--balto-glow-primary) inset, 32px 32px 80px 0px var(--balto-glow-secondary) inset;
+    }
+}
+
+@keyframes pulse-shadow {
+    0%, 100% {
+        box-shadow: -24px -24px 60px 0px var(--balto-glow-primary) inset, 32px 32px 80px 0px var(--balto-glow-secondary) inset;
+    }
+    50% {
+        box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
+    }
+}
+
+/* Output state - after animation completes */
+.styledInput.output {
+    border: 1px solid var(--balto-border-primary);
+    background: var(--balto-background-secondary);
+    box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
+    animation: fade-out-glow 3s ease forwards;
+}
+
+/* SVG outline container */
+.thinkingOutline {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border-radius: 6px;
+    z-index: 1;
+}
+
+/* Animated gradient border for thinking state */
+.gradientPath {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 92 1280;
+    stroke-dashoffset: 1360;
+    transition: none;
+    filter: drop-shadow(0 0 2px var(--balto-glow-primary));
+    opacity: 0.3;
+}
+
+/* Base border for thinking state */
+.basePath {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.3;
+}
+
+/* Completed gradient border for output state */
+.outlinePath {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+}
+
+/* Thinking state - show animated border */
+.thinkingOutline.thinking {
+    display: block;
+}
+
+.thinkingOutline.thinking .outlinePath {
+    display: none;
+}
+
+.thinkingOutline.thinking .basePath {
+    opacity: 1;
+    stroke-width: 6;
+}
+
+.thinkingOutline.thinking .gradientPath {
+    stroke-width: 6;
+    animation: trace-outline 3s linear infinite;
+    opacity: 1;
+}
+
+/* Output state - show completed border */
+.thinkingOutline.output {
+    display: block;
+}
+
+.thinkingOutline.output .outlinePath {
+    stroke-dasharray: 0;
+    stroke-width: 4;
+    opacity: 1;
+}
+
+.thinkingOutline.output .basePath {
+    display: none;
+}
+
+.thinkingOutline.output .gradientPath {
+    display: none;
+}
+
+/* Stagger the fade-out animations */
+.inputWrapper:nth-child(1) .styledInput.output {
+    animation: fade-out-glow 3s ease forwards;
+}
+
+.inputWrapper:nth-child(2) .styledInput.output {
+    animation: fade-out-glow 3s ease forwards 0.2s;
+}
+
+.inputWrapper:nth-child(3) .styledInput.output {
+    animation: fade-out-glow 3s ease forwards 0.4s;
+}
+
+.inputWrapper:nth-child(4) .styledInput.output {
+    animation: fade-out-glow 3s ease forwards 0.6s;
+}
+
+.inputWrapper:nth-child(5) .styledInput.output {
+    animation: fade-out-glow 3s ease forwards 0.8s;
+}
+
+.inputWrapper:nth-child(1) .thinkingOutline.output .outlinePath {
+    animation: fade-out-border 3s ease forwards;
+}
+
+.inputWrapper:nth-child(2) .thinkingOutline.output .outlinePath {
+    animation: fade-out-border 3s ease forwards 0.2s;
+}
+
+.inputWrapper:nth-child(3) .thinkingOutline.output .outlinePath {
+    animation: fade-out-border 3s ease forwards 0.4s;
+}
+
+.inputWrapper:nth-child(4) .thinkingOutline.output .outlinePath {
+    animation: fade-out-border 3s ease forwards 0.6s;
+}
+
+.inputWrapper:nth-child(5) .thinkingOutline.output .outlinePath {
+    animation: fade-out-border 3s ease forwards 0.8s;
+}
+
+@keyframes fade-out-glow {
+    0% {
+        box-shadow: -32px -32px 120px 0px var(--balto-glow-active) inset, 32px 32px 120px 0px var(--balto-glow-active-secondary) inset;
+    }
+    100% {
+        box-shadow: none;
+    }
+}
+
+@keyframes fade-out-border {
+    0% {
+        stroke-width: 4;
+        opacity: 1;
+    }
+    100% {
+        stroke-width: 1;
+        opacity: 0;
+    }
+}
+
 .skeletonContainer {
     position: absolute;
     top: 16px;
@@ -72,12 +273,11 @@
     background: linear-gradient(
         90deg,
         rgba(0, 0, 0, 0.08) 0%,
-        rgba(0, 0, 0, 0.16) 20%,
-        rgba(0, 0, 0, 0.16) 35%,
+        rgba(0, 0, 0, 0.12) 20%,
+        rgba(0, 0, 0, 0.12) 35%,
         rgba(0, 0, 0, 0.08) 50%,
-        rgba(0, 0, 0, 0.08) 50%,
-        rgba(0, 0, 0, 0.16) 65%,
-        rgba(0, 0, 0, 0.16) 80%,
+        rgba(0, 0, 0, 0.12) 65%,
+        rgba(0, 0, 0, 0.12) 80%,
         rgba(0, 0, 0, 0.08) 100%
     );
     background-size: 200% 100%;
@@ -101,5 +301,14 @@
     }
     to {
         background-position: -200% 0;
+    }
+}
+
+@keyframes trace-outline {
+    0% {
+        stroke-dashoffset: 1360;
+    }
+    100% {
+        stroke-dashoffset: -1360;
     }
 } 

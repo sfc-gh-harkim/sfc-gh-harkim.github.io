@@ -12,7 +12,7 @@ export default function AIInputLoaderPage() {
     const [activeValue, setActiveValue] = useState<'P50' | 'P75' | 'P95'>('P50');
     const [isTriggered, setIsTriggered] = useState(false);
     const [shouldReset, setShouldReset] = useState(false);
-    const [activeVariant, setActiveVariant] = useState<Variant>('looping');
+    const [activeVariant, setActiveVariant] = useState<Variant>('combined');
 
     const handleGenerateClick = () => {
         setShouldReset(false);
@@ -42,6 +42,12 @@ export default function AIInputLoaderPage() {
                     <h3 className={styles.controlSectionTitle}>Variant</h3>
                     <div className={styles.tabGroup}>
                         <button
+                            className={`${styles.tab} ${activeVariant === 'combined' ? styles.active : ''}`}
+                            onClick={() => setActiveVariant('combined')}
+                        >
+                            Combined
+                        </button>
+                        <button
                             className={`${styles.tab} ${activeVariant === 'looping' ? styles.active : ''}`}
                             onClick={() => setActiveVariant('looping')}
                         >
@@ -52,12 +58,6 @@ export default function AIInputLoaderPage() {
                             onClick={() => setActiveVariant('shimmer')}
                         >
                             Shimmer
-                        </button>
-                        <button
-                            className={`${styles.tab} ${activeVariant === 'combined' ? styles.active : ''}`}
-                            onClick={() => setActiveVariant('combined')}
-                        >
-                            Combined
                         </button>
                     </div>
                 </div>

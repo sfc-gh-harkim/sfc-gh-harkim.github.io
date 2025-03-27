@@ -2,17 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import multiStyles from './MultiAIInputLoader.module.css';
-import aiStyles from '../ai-input-loader/AIInputLoader.module.css';
 import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
 
 interface MultiAIInputLoaderProps {
     onThinkingComplete?: () => void;
     isTriggered?: boolean;
-    variant?: 'looping' | 'shimmer';
     shouldReset?: boolean;
     count?: number;
     hideTracer?: boolean;
     selectedDuration?: 'P50' | 'P75' | 'P95';
+    variant?: 'looping' | 'shimmer' | 'combined';
 }
 
 const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
@@ -26,17 +25,20 @@ const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefin
 export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     onThinkingComplete,
     isTriggered = false,
-    variant = 'looping',
     shouldReset = false,
     count = 5,
     hideTracer = false,
     selectedDuration,
+    variant,
 }) => {
     const [isThinking, setIsThinking] = useState(false);
     const [isOutput, setIsOutput] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
     const [currentPlaceholders, setCurrentPlaceholders] = useState<string[]>(Array(count).fill(''));
     const [statusText, setStatusText] = useState('Connecting to database');
+    
+    // Generate unique IDs for this instance
+    const instanceId = React.useId();
 
     const placeholderSequence = [
         { text: 'Connecting to database', duration: 1000 },
@@ -149,7 +151,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                 {finalTexts.map((_, index) => (
                     <div key={index} className={multiStyles.inputWrapper}>
                         <textarea
-                            className={`${aiStyles.styledInput} ${isThinking ? aiStyles.thinking : ''} ${isOutput ? aiStyles.output : ''}`}
+                            className={`${multiStyles.styledInput} ${isThinking ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
                             value={currentPlaceholders[index]}
                             readOnly
                             style={{ 
@@ -161,21 +163,25 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                         />
                         {!hideTracer && (
                             <svg
-                                className={`${aiStyles.thinkingOutline} ${variant === 'looping' ? (isThinking ? aiStyles.thinking : '') : ''} ${isOutput ? aiStyles.output : ''}`}
+                                className={`${multiStyles.thinkingOutline} ${((variant === 'looping' || variant === 'combined') && isThinking) ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
                                 width="100%"
                                 height={72}
                             >
                                 <defs>
                                     <linearGradient 
-                                        id={`loading-gradient-${index}`}
+                                        id={`loading-gradient-${instanceId}-${index}`}
                                         gradientUnits="userSpaceOnUse"
+                                        x1="0%"
+                                        y1="0%"
+                                        x2="100%"
+                                        y2="0%"
                                     >
                                         <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
                                         <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.5" />
                                         <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.3" />
                                     </linearGradient>
                                     <radialGradient 
-                                        id={`completed-gradient-${index}`} 
+                                        id={`completed-gradient-${instanceId}-${index}`} 
                                         cx="50%" 
                                         cy="50%" 
                                         r="100%" 
@@ -188,31 +194,34 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                                     </radialGradient>
                                 </defs>
                                 <rect
-                                    className={aiStyles.outlinePath}
+                                    className={multiStyles.outlinePath}
                                     width="100%"
                                     height={72}
                                     rx="6"
                                     ry="6"
+                                    style={{ stroke: `url(#completed-gradient-${instanceId}-${index})` }}
                                 />
                                 <rect
-                                    className={aiStyles.basePath}
+                                    className={multiStyles.basePath}
                                     width="100%"
                                     height={72}
                                     rx="6"
                                     ry="6"
+                                    style={{ stroke: `url(#completed-gradient-${instanceId}-${index})` }}
                                 />
                                 <rect
-                                    className={aiStyles.gradientPath}
+                                    className={multiStyles.gradientPath}
                                     width="100%"
                                     height={72}
                                     rx="6"
                                     ry="6"
+                                    style={{ stroke: `url(#loading-gradient-${instanceId}-${index})` }}
                                 />
                             </svg>
                         )}
                         {isThinking && !isOutput && (
                             <div 
-                                className={aiStyles.skeletonContainer}
+                                className={multiStyles.skeletonContainer}
                                 style={{ 
                                     opacity: isFadingOut ? 0 : 1,
                                     transition: 'opacity 0.3s ease',
@@ -221,8 +230,8 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                                     right: '16px'
                                 }}
                             >
-                                <div className={`${aiStyles.skeletonLine} ${aiStyles.shimmer}`}></div>
-                                <div className={`${aiStyles.skeletonLine} ${aiStyles.shimmer}`}></div>
+                                <div className={`${multiStyles.skeletonLine} ${multiStyles.shimmer}`}></div>
+                                <div className={`${multiStyles.skeletonLine} ${multiStyles.shimmer}`}></div>
                             </div>
                         )}
                     </div>
