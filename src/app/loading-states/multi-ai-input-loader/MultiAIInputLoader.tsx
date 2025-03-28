@@ -15,9 +15,9 @@ interface MultiAIInputLoaderProps {
 
 const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
     switch (selectedDuration) {
-        case 'P75': return 13500; // For 15s total (500ms + 13500ms + 1000ms)
-        case 'P95': return 6500; // For 38s total
-        default: return 2500; // For 5s total
+        case 'P75': return 10500; // For 15s total (2000ms + 2000ms + remaining time)
+        case 'P95': return 33500; // For 38s total (2000ms + 2000ms + remaining time)
+        default: return 500; // For 5s total (2000ms + 2000ms + remaining time)
     }
 };
 
@@ -49,10 +49,9 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     };
 
     const placeholderSequence = [
-        { text: "Searching data sources", duration: 1000 },
-        { text: "Generating description", duration: getGeneratingDuration(selectedDuration) },
-        ...(selectedDuration === 'P75' ? [{ text: "This can take up to 1 minute", duration: 5000 }] : []),
-        ...(selectedDuration === 'P95' ? [{ text: "This can take up to 1 minute", duration: 29000 }] : [])
+        { text: "Searching data sources", duration: 2000 },
+        { text: "Processing information", duration: 3000 },
+        { text: "Generating description", duration: getGeneratingDuration(selectedDuration) }
     ];
 
     const finalTexts = [
@@ -108,15 +107,14 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
             await sleep(duration);
         }
 
+        // Complete the transition before setting final status
+        setIsThinking(false);
+        setIsOutput(true);
         setStatusText('CORTEX-GENERATED DESCRIPTION');
         
         // Start fade out of skeleton shimmer
         setIsFadingOut(true);
         await sleep(400); // Match AIInputLoader's fade out duration
-        
-        // Complete the transition
-        setIsThinking(false);
-        setIsOutput(true);
         
         // Start staggered output animations
         await typeText();
@@ -163,7 +161,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                 </div>
                 <span className={multiStyles.statusText}>
                     {statusText}
-                    {isThinking && <span className={multiStyles.ellipsis}></span>}
+                    {isThinking && !isOutput && <span className={multiStyles.ellipsis}></span>}
                 </span>
             </div>
             <div className={multiStyles.inputsContainer}>

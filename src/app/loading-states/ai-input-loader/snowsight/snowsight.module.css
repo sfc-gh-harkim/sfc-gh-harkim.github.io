@@ -64,6 +64,8 @@
     position: relative;
     box-shadow: var(--balto-elevation-overlay);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
 }
 
 .reviewModal {
@@ -73,21 +75,42 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+.modalHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 0 132px;
+}
+
+.modalHeaderContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
 .modalTitle {
-    font-size: 20px;
-    line-height: 24px;
+    font-size: 16px;
+    line-height: 20px;
     font-weight: 500;
-    color: var(--balto-text-primary);
+    color: var(--balto-text-secondary);
     margin: 0;
     text-align: center;
 }
 
 .modalSubtitle {
-    font-size: 14px;
-    line-height: 20px;
-    color: var(--balto-text-secondary);
-    margin: 0 0 32px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--balto-text-tertiary);
     text-align: center;
+}
+
+.colCount {
+    font-size: 16px;
+    line-height: 20px;
+    color: var(--balto-text-tertiary);
 }
 
 .reviewTable {
@@ -124,31 +147,51 @@
     color: var(--balto-text-tertiary);
 }
 
-.checkbox {
-    width: 16px;
-    height: 16px;
-    border: 1px solid var(--balto-border-primary);
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    background: var(--balto-background-tertiary);
     border-radius: 4px;
-    background-color: var(--balto-background-primary);
-    cursor: pointer;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--balto-text-secondary);
+    height: fit-content;
 }
 
-.checkbox:hover {
-    border-color: var(--balto-border-hover);
+.modalFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-top: 1px solid var(--balto-border-primary);
+    margin: 24px -32px -32px -32px;
+    background: var(--balto-background-secondary);
 }
 
-.checkbox:checked {
-    background-color: var(--balto-background-action-primary);
-    border-color: var(--balto-background-action-primary);
+.modalFooterText {
+    color: var(--balto-text-secondary);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modalFooterText svg {
+    color: var(--balto-text-tertiary);
+    flex-shrink: 0;
 }
 
 .buttonContainer {
     display: flex;
-    justify-content: flex-end;
     gap: 8px;
-    margin-top: 16px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin-top: 24px;
+    margin-left: auto;
+}
+
+.modalFooter .buttonContainer {
+    margin-top: 0;
 }
 
 .cancelButton, .saveButton {
@@ -457,9 +500,10 @@
     padding: 32px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
     background: var(--balto-background-secondary);
     box-shadow: var(--balto-elevation-overlay);
+    position: relative;
 }
 
 .reviewTable {
@@ -502,12 +546,11 @@
 .checkbox {
     width: 16px;
     height: 16px;
-    border: 1px solid var(--balto-border-primary);
-    border-radius: 4px;
-    background-color: var(--balto-background-primary);
-    cursor: pointer;
-    margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    border-radius: 3px;
+    accent-color: var(--balto-background-action-primary);
+    opacity: 0.9;
+    border-color: var(--balto-border-primary);
+    background-color: var(--balto-background-secondary);
 }
 
 .checkbox:hover {
@@ -521,9 +564,9 @@
 
 .buttonContainer {
     display: flex;
-    justify-content: flex-end;
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 24px;
+    margin-left: auto;
 }
 
 .cancelButton, .saveButton {
@@ -967,4 +1010,19 @@ tr:hover .addButton {
 .addButton:hover {
     background-color: var(--balto-background-action-tertiary);
     color: var(--balto-text-primary);
+}
+
+.customCheckbox {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--balto-border-primary);
+    border-radius: 4px;
+    background: var(--balto-background-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.customCheckbox.checked {
+    background: var(--balto-background-action-primary);
+    border-color: var(--balto-background-action-primary);
 } 

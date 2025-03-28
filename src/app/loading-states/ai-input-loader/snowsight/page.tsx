@@ -53,7 +53,7 @@ function TableDetailsTab() {
                             height={isThinking ? 120 : 80}
                             isTriggered={isThinking}
                             startDelay={0}
-                            selectedDuration="P75"
+                            selectedDuration="P50"
                         />
                     </div>
                 </div>
@@ -93,7 +93,6 @@ function SingleColContent() {
     const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
     const [isGenerateHovered, setIsGenerateHovered] = useState(false);
-    const [hoveredGenerateLink, setHoveredGenerateLink] = useState<number | null>(null);
 
     const handleClose = () => {
         setIsModalVisible(false);
@@ -476,12 +475,10 @@ function SingleColContent() {
                                                     <button 
                                                         className={styles.generateLink}
                                                         onClick={() => handleGenerateWithCortexClick()}
-                                                        onMouseEnter={() => setHoveredGenerateLink(index)}
-                                                        onMouseLeave={() => setHoveredGenerateLink(null)}
                                                     >
                                                         Generate with Cortex
                                                     </button>
-                                                    <BaltoTooltip show={hoveredGenerateLink === index} content="This can take up to several seconds" />
+                                                    <BaltoTooltip show={false} content="This can take up to several seconds" />
                                                 </div>
                                             </td>
                                             <td>
@@ -515,7 +512,7 @@ function SingleColContent() {
                             isTriggered={true}
                             startDelay={0}
                             shouldReset={shouldReset}
-                            selectedDuration="P75"
+                            selectedDuration="P50"
                         />
                         <div className={styles.buttonContainer}>
                             <button 
@@ -537,24 +534,30 @@ function SingleColContent() {
             {isReviewModalVisible && (
                 <div className={`${styles.modal} ${styles.visible}`}>
                     <div className={`${styles.modalContent} ${styles.reviewModal}`}>
-                        <h2 className={styles.modalTitle}>Review Cortex-generated descriptions</h2>
-                        <p className={styles.modalSubtitle}>
-                            Select descriptions that you want to save. For large tables, descriptions can only be generated for 50 columns at
-                            a time. Only columns without descriptions will be included below.
-                        </p>
+                        <div className={styles.modalHeader}>
+                            <div className={styles.modalHeaderContent}>
+                                <h2 className={styles.modalTitle}>Review Cortex-generated descriptions</h2>
+                                <div className={styles.statusBadge}>1 min</div>
+                            </div>
+                            <p className={styles.modalSubtitle}>
+                                Select descriptions that you want to save. For large tables, descriptions can only be generated for 50 columns at
+                                a time. Only columns without descriptions will be included below.
+                            </p>
+                        </div>
+                        <div className={styles.colCount}>
+                            5 columns
+                        </div>
                         <table className={styles.reviewTable}>
                             <thead>
                                 <tr>
                                     <th style={{ width: '40px' }}>
-                                        <input
-                                            type="checkbox"
-                                            className={styles.checkbox}
-                                            checked={selectedColumns.length === columns.length}
-                                            onChange={(e) => {
-                                                if (e.target.checked) {
-                                                    setSelectedColumns(columns.map(col => col.name));
-                                                } else {
+                                        <div
+                                            className={`${styles.customCheckbox} ${selectedColumns.length === columns.length ? styles.checked : ''}`}
+                                            onClick={() => {
+                                                if (selectedColumns.length === columns.length) {
                                                     setSelectedColumns([]);
+                                                } else {
+                                                    setSelectedColumns(columns.map(col => col.name));
                                                 }
                                             }}
                                         />
@@ -567,22 +570,25 @@ function SingleColContent() {
                                 {columns.map((column, index) => (
                                     <tr key={column.name}>
                                         <td>
-                                            <input
-                                                type="checkbox"
-                                                className={styles.checkbox}
-                                                checked={selectedColumns.includes(column.name)}
-                                                onChange={() => handleGenerateClick()}
+                                            <div
+                                                className={`${styles.customCheckbox} ${selectedColumns.includes(column.name) ? styles.checked : ''}`}
+                                                onClick={() => {
+                                                    if (selectedColumns.includes(column.name)) {
+                                                        setSelectedColumns(selectedColumns.filter(name => name !== column.name));
+                                                    } else {
+                                                        setSelectedColumns([...selectedColumns, column.name]);
+                                                    }
+                                                }}
                                             />
                                         </td>
                                         <td>{column.name}</td>
                                         <td>{column.sampleValues.join('\n')}</td>
                                         {index === 0 && (
                                             <td rowSpan={6} style={{ padding: 0 }}>
-                                                <div style={{ width: '600px', padding: '16px', marginTop: '-48px' }}>
+                                                <div style={{ width: '600px', padding: '16px', marginTop: '-48px', marginLeft: '40px' }}>
                                                     {isReviewModalVisible && (
                                                         <MultiAIInputLoader
                                                             isTriggered={true}
-                                                            hideTracer={true}
                                                             selectedDuration="P75"
                                                         />
                                                     )}
@@ -593,19 +599,29 @@ function SingleColContent() {
                                 ))}
                             </tbody>
                         </table>
-                        <div className={styles.buttonContainer}>
-                            <button 
-                                className={styles.cancelButton}
-                                onClick={() => setIsReviewModalVisible(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                className={styles.saveButton}
-                                onClick={() => setIsReviewModalVisible(false)}
-                            >
-                                Save
-                            </button>
+                        <div className={styles.modalFooter}>
+                            <div className={styles.modalFooterText}>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M8 11V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <circle cx="8" cy="5" r="0.5" fill="currentColor"/>
+                                </svg>
+                                Always review content generated by AI to make sure it&apos;s accurate.
+                            </div>
+                            <div className={styles.buttonContainer}>
+                                <button 
+                                    className={styles.cancelButton}
+                                    onClick={() => setIsReviewModalVisible(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    className={styles.saveButton}
+                                    onClick={() => setIsReviewModalVisible(false)}
+                                >
+                                    Save
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

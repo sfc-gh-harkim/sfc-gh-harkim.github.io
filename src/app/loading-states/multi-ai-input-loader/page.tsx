@@ -7,7 +7,7 @@ import { ControlBar } from '@/app/layouts/ControlBar';
 import styles from '@/app/styles/designlab.module.css';
 
 export default function MultiAIInputLoaderPage() {
-    const [activeValue, setActiveValue] = useState<'P50' | 'P75' | 'P95'>('P50');
+    const [activeValue, setActiveValue] = useState<'P50' | 'P75' | 'P95'>('P75');
     const [isTriggered, setIsTriggered] = useState(false);
     const [shouldReset, setShouldReset] = useState(false);
 
