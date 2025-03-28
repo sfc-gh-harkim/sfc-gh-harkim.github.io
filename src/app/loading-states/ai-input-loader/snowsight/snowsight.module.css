@@ -148,6 +148,9 @@
 }
 
 .statusBadge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
     display: inline-flex;
     align-items: center;
     padding: 2px 6px;
@@ -1024,4 +1027,12 @@ tr:hover .addButton {
 .customCheckbox.checked {
     background: var(--balto-background-action-primary);
     border-color: var(--balto-background-action-primary);
+}
+
+.loaderContainer {
+    width: 600px;
+    padding: 16px;
+    margin-top: -48px;
+    margin-left: 40px;
+    position: relative;
 } 

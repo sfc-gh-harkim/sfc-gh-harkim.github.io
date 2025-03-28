@@ -537,7 +537,6 @@ function SingleColContent() {
                         <div className={styles.modalHeader}>
                             <div className={styles.modalHeaderContent}>
                                 <h2 className={styles.modalTitle}>Review Cortex-generated descriptions</h2>
-                                <div className={styles.statusBadge}>1 min</div>
                             </div>
                             <p className={styles.modalSubtitle}>
                                 Select descriptions that you want to save. For large tables, descriptions can only be generated for 50 columns at
@@ -585,13 +584,14 @@ function SingleColContent() {
                                         <td>{column.sampleValues.join('\n')}</td>
                                         {index === 0 && (
                                             <td rowSpan={6} style={{ padding: 0 }}>
-                                                <div style={{ width: '600px', padding: '16px', marginTop: '-48px', marginLeft: '40px' }}>
+                                                <div className={styles.loaderContainer}>
                                                     {isReviewModalVisible && (
                                                         <MultiAIInputLoader
                                                             isTriggered={true}
                                                             selectedDuration="P75"
                                                         />
                                                     )}
+                                                    <div className={styles.statusBadge}>Usually takes about 1 minute</div>
                                                 </div>
                                             </td>
                                         )}
