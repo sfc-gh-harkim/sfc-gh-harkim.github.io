@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AIInputLoader.module.css';
 import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
-import Head from 'next/head';
 
 export interface BaseAIInputLoaderProps {
     onThinkingComplete?: () => void;
@@ -43,28 +42,6 @@ export function BaseAIInputLoader({
     const [currentPlaceholder, setCurrentPlaceholder] = useState("");
     const [statusText, setStatusText] = useState("");
     const [ellipsis, setEllipsis] = useState('');
-
-    const updateFavicon = (state: 'thinking' | 'output' | 'default') => {
-        // Remove any existing favicon links
-        const existingLinks = document.querySelectorAll("link[rel~='icon']");
-        existingLinks.forEach(link => link.remove());
-
-        // Create and append new favicon link
-        const link = document.createElement('link');
-        link.rel = 'icon';
-        link.href = `/assets/${state}.svg`;
-        document.head.appendChild(link);
-    };
-
-    useEffect(() => {
-        if (isThinking) {
-            updateFavicon('thinking');
-        } else if (isOutput) {
-            updateFavicon('output');
-        } else {
-            updateFavicon('default');
-        }
-    }, [isThinking, isOutput]);
 
     const placeholderSequence = [
         { text: "Searching data sources", duration: 1000 },
@@ -192,106 +169,101 @@ export function BaseAIInputLoader({
     };
 
     return (
-        <>
-            <Head>
-                <link rel="icon" href={isThinking ? "/assets/thinking.svg" : isOutput ? "/assets/output.svg" : "/favicon.ico"} />
-            </Head>
-            <div className={styles.container}>
-                <div className={styles.inputContainer} style={{ width, height }}>
-                    <div className={styles.statusTextContainer}>
-                        {(!isThinking && !isOutput) ? (
-                            <span className={`${styles.statusText} ${styles.resting}`}>
-                                Write a description or{' '}
-                                <button 
-                                    onClick={toggleThinking}
-                                    className={styles.generateButton}
-                                >
-                                    Generate with Cortex
-                                </button>
-                            </span>
-                        ) : (
-                            <>
-                                <div className={styles.avatarContainer}>
-                                    <AnimatedAvatar 
-                                        width={20} 
-                                        height={20}
-                                        isPlaying={isThinking}
-                                        isOutput={isOutput}
-                                    />
-                                </div>
-                                <span className={styles.statusText}>{statusText}</span>
-                            </>
-                        )}
-                    </div>
-                    <textarea
-                        className={`${styles.styledInput} ${isThinking ? styles.thinking : ''} ${isOutput ? styles.output : ''}`}
-                        value={currentPlaceholder}
-                        readOnly
-                        style={{ width, height, resize: 'none' }}
-                    />
-                    <svg
-                        className={`${styles.thinkingOutline} ${((variant === 'looping' || variant === 'combined') && isThinking) ? styles.thinking : ''} ${isOutput ? styles.output : ''}`}
-                        width={width}
-                        height={height}
-                    >
-                        <defs>
-                            <linearGradient 
-                                id="loading-gradient" 
-                                gradientUnits="userSpaceOnUse"
+        <div className={styles.container}>
+            <div className={styles.inputContainer} style={{ width, height }}>
+                <div className={styles.statusTextContainer}>
+                    {(!isThinking && !isOutput) ? (
+                        <span className={`${styles.statusText} ${styles.resting}`}>
+                            Write a description or{' '}
+                            <button 
+                                onClick={toggleThinking}
+                                className={styles.generateButton}
                             >
-                                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
-                                <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.5" />
-                                <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.3" />
-                            </linearGradient>
-                            <radialGradient id="completed-gradient" cx="50%" cy="50%" r="100%" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="#2986E8" />
-                                <stop offset="33%" stopColor="#90E0FD" />
-                                <stop offset="66%" stopColor="#11C5CF" />
-                                <stop offset="100%" stopColor="#2986E8" />
-                            </radialGradient>
-                        </defs>
-                        <rect
-                            className={styles.outlinePath}
-                            width={width}
-                            height={height}
-                            rx="6"
-                            ry="6"
-                        />
-                        <rect
-                            className={styles.basePath}
-                            width={width}
-                            height={height}
-                            rx="6"
-                            ry="6"
-                        />
-                        <rect
-                            className={styles.gradientPath}
-                            width={width}
-                            height={height}
-                            rx="6"
-                            ry="6"
-                        />
-                    </svg>
-                    {variant === 'shimmer' && (
-                        <div 
-                            className={styles.skeletonContainer}
-                            style={{ opacity: isThinking && !isOutput ? 1 : 0, transition: 'opacity 0.3s ease' }}
-                        >
-                            <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
-                            <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
-                        </div>
-                    )}
-                    {variant === 'combined' && (
-                        <div 
-                            className={styles.skeletonContainer}
-                            style={{ opacity: isThinking && !isOutput ? 1 : 0, transition: 'opacity 0.3s ease' }}
-                        >
-                            <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
-                            <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
-                        </div>
+                                Generate with Cortex
+                            </button>
+                        </span>
+                    ) : (
+                        <>
+                            <div className={styles.avatarContainer}>
+                                <AnimatedAvatar 
+                                    width={20} 
+                                    height={20}
+                                    isPlaying={isThinking}
+                                    isOutput={isOutput}
+                                />
+                            </div>
+                            <span className={styles.statusText}>{statusText}</span>
+                        </>
                     )}
                 </div>
+                <textarea
+                    className={`${styles.styledInput} ${isThinking ? styles.thinking : ''} ${isOutput ? styles.output : ''}`}
+                    value={currentPlaceholder}
+                    readOnly
+                    style={{ width, height, resize: 'none' }}
+                />
+                <svg
+                    className={`${styles.thinkingOutline} ${((variant === 'looping' || variant === 'combined') && isThinking) ? styles.thinking : ''} ${isOutput ? styles.output : ''}`}
+                    width={width}
+                    height={height}
+                >
+                    <defs>
+                        <linearGradient 
+                            id="loading-gradient" 
+                            gradientUnits="userSpaceOnUse"
+                        >
+                            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
+                            <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.5" />
+                            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.3" />
+                        </linearGradient>
+                        <radialGradient id="completed-gradient" cx="50%" cy="50%" r="100%" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="#2986E8" />
+                            <stop offset="33%" stopColor="#90E0FD" />
+                            <stop offset="66%" stopColor="#11C5CF" />
+                            <stop offset="100%" stopColor="#2986E8" />
+                        </radialGradient>
+                    </defs>
+                    <rect
+                        className={styles.outlinePath}
+                        width={width}
+                        height={height}
+                        rx="6"
+                        ry="6"
+                    />
+                    <rect
+                        className={styles.basePath}
+                        width={width}
+                        height={height}
+                        rx="6"
+                        ry="6"
+                    />
+                    <rect
+                        className={styles.gradientPath}
+                        width={width}
+                        height={height}
+                        rx="6"
+                        ry="6"
+                    />
+                </svg>
+                {variant === 'shimmer' && (
+                    <div 
+                        className={styles.skeletonContainer}
+                        style={{ opacity: isThinking && !isOutput ? 1 : 0, transition: 'opacity 0.3s ease' }}
+                    >
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                    </div>
+                )}
+                {variant === 'combined' && (
+                    <div 
+                        className={styles.skeletonContainer}
+                        style={{ opacity: isThinking && !isOutput ? 1 : 0, transition: 'opacity 0.3s ease' }}
+                    >
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                        <div className={`${styles.skeletonLine} ${styles.shimmer}`}></div>
+                    </div>
+                )}
             </div>
-        </>
+        </div>
     );
 } 

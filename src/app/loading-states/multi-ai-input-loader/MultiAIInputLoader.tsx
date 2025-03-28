@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import multiStyles from './MultiAIInputLoader.module.css';
 import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
-import Head from 'next/head';
 
 interface MultiAIInputLoaderProps {
     onThinkingComplete?: () => void;
@@ -39,28 +38,6 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     
     // Generate unique IDs for this instance
     const instanceId = React.useId();
-
-    const updateFavicon = (state: 'thinking' | 'output' | 'default') => {
-        // Remove any existing favicon links
-        const existingLinks = document.querySelectorAll("link[rel~='icon']");
-        existingLinks.forEach(link => link.remove());
-
-        // Create and append new favicon link
-        const link = document.createElement('link');
-        link.rel = 'icon';
-        link.href = `/assets/${state}.svg`;
-        document.head.appendChild(link);
-    };
-
-    useEffect(() => {
-        if (isThinking) {
-            updateFavicon('thinking');
-        } else if (isOutput) {
-            updateFavicon('output');
-        } else {
-            updateFavicon('default');
-        }
-    }, [isThinking, isOutput]);
 
     const animateEllipsis = () => {
         let count = 0;
@@ -174,116 +151,111 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     };
 
     return (
-        <>
-            <Head>
-                <link rel="icon" href={isThinking ? "/assets/thinking.svg" : isOutput ? "/assets/output.svg" : "/favicon.ico"} />
-            </Head>
-            <div className={multiStyles.container}>
-                <div className={multiStyles.statusTextContainer}>
-                    <div className={multiStyles.avatarContainer}>
-                        <AnimatedAvatar 
-                            width={20} 
-                            height={20}
-                            isPlaying={isThinking}
-                            isOutput={isOutput}
-                        />
-                    </div>
-                    <span className={multiStyles.statusText}>
-                        {statusText}
-                        {isThinking && <span className={multiStyles.ellipsis}></span>}
-                    </span>
+        <div className={multiStyles.container}>
+            <div className={multiStyles.statusTextContainer}>
+                <div className={multiStyles.avatarContainer}>
+                    <AnimatedAvatar 
+                        width={20} 
+                        height={20}
+                        isPlaying={isThinking}
+                        isOutput={isOutput}
+                    />
                 </div>
-                <div className={multiStyles.inputsContainer}>
-                    {finalTexts.map((_, index) => (
-                        <div key={index} className={multiStyles.inputWrapper}>
-                            <textarea
-                                className={`${multiStyles.styledInput} ${isThinking ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
-                                value={currentPlaceholders[index]}
-                                readOnly
-                                style={{ 
-                                    width: '100%',
-                                    height: '72px', 
-                                    resize: 'none',
-                                    padding: '16px'
-                                }}
-                            />
-                            {!hideTracer && (
-                                <svg
-                                    className={`${multiStyles.thinkingOutline} ${isThinking ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
+                <span className={multiStyles.statusText}>
+                    {statusText}
+                    {isThinking && <span className={multiStyles.ellipsis}></span>}
+                </span>
+            </div>
+            <div className={multiStyles.inputsContainer}>
+                {finalTexts.map((_, index) => (
+                    <div key={index} className={multiStyles.inputWrapper}>
+                        <textarea
+                            className={`${multiStyles.styledInput} ${isThinking ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
+                            value={currentPlaceholders[index]}
+                            readOnly
+                            style={{ 
+                                width: '100%',
+                                height: '72px', 
+                                resize: 'none',
+                                padding: '16px'
+                            }}
+                        />
+                        {!hideTracer && (
+                            <svg
+                                className={`${multiStyles.thinkingOutline} ${isThinking ? multiStyles.thinking : ''} ${isOutput ? multiStyles.output : ''}`}
+                                width="100%"
+                                height={72}
+                            >
+                                <defs>
+                                    <linearGradient 
+                                        id={`loading-gradient-${instanceId}-${index}`}
+                                        gradientUnits="userSpaceOnUse"
+                                        x1="0%"
+                                        y1="0%"
+                                        x2="100%"
+                                        y2="0%"
+                                    >
+                                        <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
+                                        <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.5" />
+                                        <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.3" />
+                                    </linearGradient>
+                                    <radialGradient 
+                                        id={`completed-gradient-${instanceId}-${index}`} 
+                                        cx="50%" 
+                                        cy="50%" 
+                                        r="100%" 
+                                        gradientUnits="userSpaceOnUse"
+                                    >
+                                        <stop offset="0%" stopColor="#2986E8" />
+                                        <stop offset="33%" stopColor="#90E0FD" />
+                                        <stop offset="66%" stopColor="#11C5CF" />
+                                        <stop offset="100%" stopColor="#2986E8" />
+                                    </radialGradient>
+                                </defs>
+                                <rect
+                                    className={multiStyles.outlinePath}
                                     width="100%"
                                     height={72}
-                                >
-                                    <defs>
-                                        <linearGradient 
-                                            id={`loading-gradient-${instanceId}-${index}`}
-                                            gradientUnits="userSpaceOnUse"
-                                            x1="0%"
-                                            y1="0%"
-                                            x2="100%"
-                                            y2="0%"
-                                        >
-                                            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.3" />
-                                            <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.5" />
-                                            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.3" />
-                                        </linearGradient>
-                                        <radialGradient 
-                                            id={`completed-gradient-${instanceId}-${index}`} 
-                                            cx="50%" 
-                                            cy="50%" 
-                                            r="100%" 
-                                            gradientUnits="userSpaceOnUse"
-                                        >
-                                            <stop offset="0%" stopColor="#2986E8" />
-                                            <stop offset="33%" stopColor="#90E0FD" />
-                                            <stop offset="66%" stopColor="#11C5CF" />
-                                            <stop offset="100%" stopColor="#2986E8" />
-                                        </radialGradient>
-                                    </defs>
-                                    <rect
-                                        className={multiStyles.outlinePath}
-                                        width="100%"
-                                        height={72}
-                                        rx="6"
-                                        ry="6"
-                                        style={{ stroke: `url(#completed-gradient-${instanceId}-${index})` }}
-                                    />
-                                    <rect
-                                        className={multiStyles.basePath}
-                                        width="100%"
-                                        height={72}
-                                        rx="6"
-                                        ry="6"
-                                        style={{ stroke: `url(#completed-gradient-${instanceId}-${index})` }}
-                                    />
-                                    <rect
-                                        className={multiStyles.gradientPath}
-                                        width="100%"
-                                        height={72}
-                                        rx="6"
-                                        ry="6"
-                                        style={{ stroke: `url(#loading-gradient-${instanceId}-${index})` }}
-                                    />
-                                </svg>
-                            )}
-                            {isThinking && !isOutput && (
-                                <div 
-                                    className={multiStyles.skeletonContainer}
-                                    style={{ 
-                                        opacity: isFadingOut ? 0 : 1,
-                                        transition: 'opacity 0.3s ease',
-                                        top: '16px',
-                                        left: '16px',
-                                        right: '16px'
-                                    }}
-                                >
-                                    <div className={`${multiStyles.skeletonLine} ${multiStyles.shimmer}`}></div>
-                                    <div className={`${multiStyles.skeletonLine} ${multiStyles.shimmer}`}></div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                                    rx="6"
+                                    ry="6"
+                                    style={{ stroke: `url(#completed-gradient-${instanceId}-${index})` }}
+                                />
+                                <rect
+                                    className={multiStyles.basePath}
+                                    width="100%"
+                                    height={72}
+                                    rx="6"
+                                    ry="6"
+                                    style={{ stroke: `url(#completed-gradient-${instanceId}-${index})` }}
+                                />
+                                <rect
+                                    className={multiStyles.gradientPath}
+                                    width="100%"
+                                    height={72}
+                                    rx="6"
+                                    ry="6"
+                                    style={{ stroke: `url(#loading-gradient-${instanceId}-${index})` }}
+                                />
+                            </svg>
+                        )}
+                        {isThinking && !isOutput && (
+                            <div 
+                                className={multiStyles.skeletonContainer}
+                                style={{ 
+                                    opacity: isFadingOut ? 0 : 1,
+                                    transition: 'opacity 0.3s ease',
+                                    top: '16px',
+                                    left: '16px',
+                                    right: '16px'
+                                }}
+                            >
+                                <div className={`${multiStyles.skeletonLine} ${multiStyles.shimmer}`}></div>
+                                <div className={`${multiStyles.skeletonLine} ${multiStyles.shimmer}`}></div>
+                            </div>
+                        )}
+                    </div>
+                ))}
             </div>
-        </>
+        </div>
     );
 }
