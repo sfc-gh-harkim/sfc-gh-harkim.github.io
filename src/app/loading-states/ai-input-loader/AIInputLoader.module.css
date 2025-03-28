@@ -42,14 +42,14 @@
 .statusText.resting {
     font-size: 14px;
     line-height: 20px;
-    color: var(--balto-text-primary);
+    color: var(--balto-text-secondary);
     text-transform: none;
 }
 
 .generateButton {
     font-size: 14px;
     line-height: 20px;
-    color: var(--balto-text-primary);
+    color: var(--balto-text-secondary);
     font-weight: 500;
     text-decoration: underline;
     background: none;

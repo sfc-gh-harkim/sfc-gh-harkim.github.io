@@ -15,9 +15,9 @@ interface MultiAIInputLoaderProps {
 
 const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
     switch (selectedDuration) {
-        case 'P75': return 6000; // 2000 + 4000 additional
-        case 'P95': return 35000; // 2000 + 33000 additional
-        default: return 2000; // Default P50 duration
+        case 'P75': return 13500; // For 15s total (500ms + 13500ms + 1000ms)
+        case 'P95': return 6500; // For 38s total
+        default: return 2500; // For 5s total
     }
 };
 
@@ -33,7 +33,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     const [isOutput, setIsOutput] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
     const [currentPlaceholders, setCurrentPlaceholders] = useState<string[]>(Array(count).fill(''));
-    const [statusText, setStatusText] = useState('Connecting to database');
+    const [statusText, setStatusText] = useState("");
     const [ellipsis, setEllipsis] = useState('');
     
     // Generate unique IDs for this instance
@@ -49,9 +49,10 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
     };
 
     const placeholderSequence = [
-        { text: 'Connecting to database', duration: 1000 },
-        { text: 'Sampling data', duration: 1500 },
-        { text: 'Generating descriptions', duration: getGeneratingDuration(selectedDuration) }
+        { text: "Searching data sources", duration: 1000 },
+        { text: "Generating description", duration: getGeneratingDuration(selectedDuration) },
+        ...(selectedDuration === 'P75' ? [{ text: "This can take up to 1 minute", duration: 5000 }] : []),
+        ...(selectedDuration === 'P95' ? [{ text: "This can take up to 1 minute", duration: 29000 }] : [])
     ];
 
     const finalTexts = [
@@ -68,7 +69,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
             setIsOutput(false);
             setIsFadingOut(false);
             setCurrentPlaceholders(Array(count).fill(''));
-            setStatusText('Connecting to database');
+            setStatusText("");
             setEllipsis('');
         }
     }, [shouldReset, count]);
@@ -81,7 +82,7 @@ export const MultiAIInputLoader: React.FC<MultiAIInputLoaderProps> = ({
                 setIsOutput(false);
                 setIsFadingOut(false);
                 setCurrentPlaceholders(Array(count).fill(''));
-                setStatusText('Connecting to database');
+                setStatusText("");
                 setEllipsis('');
             }
             // Start the animation

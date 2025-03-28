@@ -3,11 +3,17 @@
     --balto-background-primary: #1f2937;
     --balto-background-secondary: #1D252F;
     --balto-background-tertiary: #293246;
+    --balto-background-action-primary: #2b67ef;
+    --balto-background-action-secondary: #021e5b;
+    --balto-background-action-tertiary: #1D252F;
+    --balto-background-action-selected: #5999f8;
     
     /* Component Text Colors */
     --balto-text-primary: #f3f4f6;
     --balto-text-secondary: #BDC4D5;
     --balto-text-tertiary: #9ca3af;
+    --balto-text-inverse: #002c6e;
+    --balto-text-selected: #5999f8;
     
     /* Component Border Colors */
     --balto-border-primary: #293246;
@@ -28,6 +34,19 @@
     --balto-skeleton-start: rgba(0, 0, 0, 0.08);
     --balto-skeleton-middle: rgba(0, 0, 0, 0.16);
     --balto-skeleton-end: rgba(0, 0, 0, 0.08);
+
+    /* Syntax highlighting tokens */
+    --balto-syntax-keyword: #569CD6;
+    --balto-syntax-type: #4EC9B0;
+    --balto-syntax-string: #CE9178;
+    --balto-syntax-comment: #6A9955;
+    --balto-syntax-property: #9CDCFE;
+    --balto-syntax-background: #0d1217;
+
+    /* Elevation tokens */
+    --balto-elevation-raised: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    --balto-elevation-floating: 0px 4px 8px rgba(0, 0, 0, 0.25);
+    --balto-elevation-overlay: 0px 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* Light mode variables for components */
@@ -58,4 +77,30 @@
     --balto-skeleton-start: rgba(255, 255, 255, 0.04);
     --balto-skeleton-middle: rgba(255, 255, 255, 0.08);
     --balto-skeleton-end: rgba(255, 255, 255, 0.04);
+
+    /* Syntax highlighting tokens - light theme */
+    --balto-syntax-keyword: #0000FF;
+    --balto-syntax-type: #267F99;
+    --balto-syntax-string: #A31515;
+    --balto-syntax-comment: #008000;
+    --balto-syntax-property: #001080;
+
+    /* Elevation tokens - light theme */
+    --balto-elevation-raised: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    --balto-elevation-floating: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    --balto-elevation-overlay: 0px 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] {
+    /* Syntax highlighting tokens - dark theme */
+    --balto-syntax-keyword: #569CD6;
+    --balto-syntax-type: #4EC9B0;
+    --balto-syntax-string: #CE9178;
+    --balto-syntax-comment: #6A9955;
+    --balto-syntax-property: #9CDCFE;
+
+    /* Elevation tokens - dark theme */
+    --balto-elevation-raised: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    --balto-elevation-floating: 0px 4px 8px rgba(0, 0, 0, 0.25);
+    --balto-elevation-overlay: 0px 8px 16px rgba(0, 0, 0, 0.3);
 } 

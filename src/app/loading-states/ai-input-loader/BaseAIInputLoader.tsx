@@ -18,16 +18,11 @@ export interface BaseAIInputLoaderProps {
 
 const getGeneratingDuration = (selectedDuration: 'P50' | 'P75' | 'P95' | undefined) => {
     switch (selectedDuration) {
-        case 'P75': return 6000; // 2000 + 4000 additional
-        case 'P95': return 35000; // 2000 + 33000 additional
-        default: return 2000; // Default P50 duration
+        case 'P75': return 12500; // For 15s total (500ms + 12500ms + 5000ms)
+        case 'P95': return 6500; // For 38s total
+        default: return 2500; // For 5s total
     }
 };
-
-const placeholderSequence = [
-    { text: "Connecting to database", duration: 1000 },
-    { text: "Sampling data", duration: 2000 }
-];
 
 const FINAL_TEXT = "Size of wheels being placed on bikes within the store inventory";
 
@@ -47,6 +42,13 @@ export function BaseAIInputLoader({
     const [currentPlaceholder, setCurrentPlaceholder] = useState("");
     const [statusText, setStatusText] = useState("");
     const [ellipsis, setEllipsis] = useState('');
+
+    const placeholderSequence = [
+        { text: "Searching data sources", duration: 1000 },
+        { text: "Generating description", duration: getGeneratingDuration(selectedDuration) },
+        ...(selectedDuration === 'P75' ? [{ text: "This can take up to 1 minute", duration: 5000 }] : []),
+        ...(selectedDuration === 'P95' ? [{ text: "This can take up to 1 minute", duration: 29000 }] : [])
+    ];
 
     const animateEllipsis = () => {
         let count = 0;
@@ -122,10 +124,6 @@ export function BaseAIInputLoader({
                     await new Promise(resolve => setTimeout(resolve, step.duration));
                 }
 
-                // Set the "Generating description" state with dynamic duration
-                setStatusText("Generating description");
-                await new Promise(resolve => setTimeout(resolve, getGeneratingDuration(selectedDuration)));
-
                 clearInterval(ellipsisInterval);
                 setIsThinking(false);
                 setIsOutput(true);
@@ -155,10 +153,6 @@ export function BaseAIInputLoader({
                 setStatusText(step.text);
                 await new Promise(resolve => setTimeout(resolve, step.duration));
             }
-
-            // Set the "Generating description" state with dynamic duration
-            setStatusText("Generating description");
-            await new Promise(resolve => setTimeout(resolve, getGeneratingDuration(selectedDuration)));
 
             clearInterval(ellipsisInterval);
             setIsThinking(false);

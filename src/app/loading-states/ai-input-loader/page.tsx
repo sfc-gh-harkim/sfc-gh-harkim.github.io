@@ -75,7 +75,7 @@ export default function AIInputLoaderPage() {
                             className={`${styles.tab} ${activeValue === 'P75' ? styles.active : ''}`}
                             onClick={() => setActiveValue('P75')}
                         >
-                            9s
+                            15s
                         </button>
                         <button
                             className={`${styles.tab} ${activeValue === 'P95' ? styles.active : ''}`}
