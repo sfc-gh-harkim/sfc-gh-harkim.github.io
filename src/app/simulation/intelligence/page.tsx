@@ -1,12 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import styles from './intelligence.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+// Main export component with Suspense
 export default function IntelligencePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <IntelligenceContent />
+    </Suspense>
+  );
+}
+
+// Client component that uses searchParams
+function IntelligenceContent() {
   const searchParams = useSearchParams();
   const isTestMode = searchParams.get('test') === '1';
   

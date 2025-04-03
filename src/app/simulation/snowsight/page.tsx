@@ -633,6 +633,14 @@ function SingleColContent({ statusBadgeStyle }: { statusBadgeStyle: string | nul
 }
 
 export default function SingleColPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SingleColPageContent />
+        </Suspense>
+    );
+}
+
+function SingleColPageContent() {
     const searchParams = useSearchParams();
     const isTestMode = searchParams.get('statusBadge') === '1';
     const [activeStyle, setActiveStyle] = useState<string | null>(null);
@@ -645,9 +653,7 @@ export default function SingleColPage() {
     
     return (
         <>
-            <Suspense>
-                <SingleColContent statusBadgeStyle={activeStyle} />
-            </Suspense>
+            <SingleColContent statusBadgeStyle={activeStyle} />
             
             {isTestMode && (
                 <div className={styles.testPanel}>
