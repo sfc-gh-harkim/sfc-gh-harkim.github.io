@@ -658,10 +658,10 @@ function SingleColPageContent() {
             {isTestMode && (
                 <div className={styles.testPanel}>
                     <button 
-                        className={`${styles.testButton} ${activeStyle === 'haloShimmer' ? styles.activeButton : ''}`}
-                        onClick={() => handleStyleChange('haloShimmer')}
+                        className={`${styles.testButton} ${activeStyle === null ? styles.activeButton : ''}`}
+                        onClick={() => handleStyleChange('remove')}
                     >
-                        Halo (Shimmer)
+                        No Styles
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'infoStatic' ? styles.activeButton : ''}`}
@@ -676,10 +676,10 @@ function SingleColPageContent() {
                         Info Status (Shimmer)
                     </button>
                     <button 
-                        className={`${styles.testButton} ${activeStyle === null ? styles.activeButton : ''}`}
-                        onClick={() => handleStyleChange('remove')}
+                        className={`${styles.testButton} ${activeStyle === 'haloShimmer' ? styles.activeButton : ''}`}
+                        onClick={() => handleStyleChange('haloShimmer')}
                     >
-                        Remove Styles
+                        Halo (Shimmer)
                     </button>
                 </div>
             )}
