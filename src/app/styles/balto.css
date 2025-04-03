@@ -7,12 +7,14 @@
     --balto-background-action-secondary: #021e5b;
     --balto-background-action-tertiary: #1D252F;
     --balto-background-action-selected: #5999f8;
+    --balto-background-info: rgba(26, 108, 231, 0.2);
     
     /* Component Text Colors */
     --balto-text-primary: #f3f4f6;
     --balto-text-secondary: #BDC4D5;
     --balto-text-tertiary: #8A96AD;
     --balto-text-inverse: #002c6e;
+    --balto-text-info: #86B6FC;
     --balto-text-selected: #5999f8;
     
     /* Component Border Colors */

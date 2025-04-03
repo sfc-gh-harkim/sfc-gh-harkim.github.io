@@ -96,7 +96,7 @@ export default function AIInputLoaderPage() {
                     </button>
                     <div className={styles.controlButtonGroup}>
                         <a
-                            href={`/loading-states/ai-input-loader/snowsight?tab=columns&variant=${activeVariant}`}
+                            href={`/simulation/snowsight?tab=columns&variant=${activeVariant}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.viewButton}
@@ -120,7 +120,7 @@ export default function AIInputLoaderPage() {
                             </svg>
                         </a>
                         <a
-                            href={`/loading-states/ai-input-loader/snowsight?tab=details&variant=${activeVariant}`}
+                            href={`/simulation/snowsight?tab=details&variant=${activeVariant}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.viewButton}

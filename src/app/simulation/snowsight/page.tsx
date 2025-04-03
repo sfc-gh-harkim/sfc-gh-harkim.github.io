@@ -1,7 +1,7 @@
 'use client';
 
-import { BaseAIInputLoader } from '../BaseAIInputLoader';
-import { MultiAIInputLoader } from '../../multi-ai-input-loader/MultiAIInputLoader';
+import { BaseAIInputLoader } from '@/app/loading-states/ai-input-loader/BaseAIInputLoader';
+import { MultiAIInputLoader } from '@/app/loading-states/multi-ai-input-loader/MultiAIInputLoader';
 import styles from './snowsight.module.css';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, Suspense, useRef, useEffect } from 'react';
@@ -119,7 +119,7 @@ function SingleColContent() {
     const handleTabClick = (newTab: string) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', newTab);
-        router.push(`/loading-states/ai-input-loader/snowsight?${params.toString()}`);
+        router.push(`/simulation/snowsight?${params.toString()}`);
     };
 
     const DatabaseIcon = () => (
@@ -631,9 +631,70 @@ function SingleColContent() {
 }
 
 export default function SingleColPage() {
+    const searchParams = useSearchParams();
+    const isTestMode = searchParams.get('statusBadge') === '1';
+    const [activeStyle, setActiveStyle] = useState<string | null>(null);
+    
+    // Handle style change when a button is clicked
+    const handleStyleChange = (style: 'haloShimmer' | 'infoStatic' | 'infoShimmer' | 'remove') => {
+        // Find the status badges without modifying their DOM position
+        const statusBadges = document.querySelectorAll(`.${styles.statusBadge}`);
+        
+        if (statusBadges) {
+            statusBadges.forEach(badge => {
+                // First, remove all possible style classes
+                badge.classList.remove(
+                    styles.haloShimmer, 
+                    styles.infoStatic, 
+                    styles.infoShimmer
+                );
+                
+                // Then add the selected style if it's not "remove"
+                if (style !== 'remove') {
+                    requestAnimationFrame(() => {
+                        badge.classList.add(styles[style]);
+                    });
+                }
+            });
+        }
+        
+        setActiveStyle(style === 'remove' ? null : style);
+    };
+    
     return (
-        <Suspense>
-            <SingleColContent />
-        </Suspense>
+        <>
+            <Suspense>
+                <SingleColContent />
+            </Suspense>
+            
+            {isTestMode && (
+                <div className={styles.testPanel}>
+                    <button 
+                        className={`${styles.testButton} ${activeStyle === 'haloShimmer' ? styles.activeButton : ''}`}
+                        onClick={() => handleStyleChange('haloShimmer')}
+                    >
+                        Halo (Shimmer)
+                    </button>
+                    <button 
+                        className={`${styles.testButton} ${activeStyle === 'infoStatic' ? styles.activeButton : ''}`}
+                        onClick={() => handleStyleChange('infoStatic')}
+                    >
+                        Info Status (Static)
+                    </button>
+                    <button 
+                        className={`${styles.testButton} ${activeStyle === 'infoShimmer' ? styles.activeButton : ''}`}
+                        onClick={() => handleStyleChange('infoShimmer')}
+                    >
+                        Info Status (Shimmer)
+                    </button>
+                    <button 
+                        className={`${styles.testButton} ${activeStyle === null ? styles.activeButton : ''}`}
+                        onClick={() => handleStyleChange('remove')}
+                    >
+                        Remove Styles
+                    </button>
+                </div>
+            )}
+        </>
     );
 } 

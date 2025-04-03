@@ -67,7 +67,7 @@ export default function MultiAIInputLoaderPage() {
                     </button>
                     <div className={styles.controlButtonGroup}>
                         <a
-                            href={`/loading-states/ai-input-loader/snowsight?tab=columns`}
+                            href={`/simulation/snowsight?tab=columns`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.viewButton}

@@ -9,6 +9,7 @@ interface SidebarItem {
   title: string;
   href: string;
   children?: SidebarItem[];
+  external?: boolean;
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -31,6 +32,11 @@ const sidebarItems: SidebarItem[] = [
       { title: 'States', href: '/avatar/states' },
       { title: 'Dynamic Expressions', href: '/avatar/dynamic-expressions' },
     ],
+  },
+  {
+    title: 'Snowflake Intelligence',
+    href: '/simulation/intelligence',
+    external: true,
   },
 ];
 
@@ -87,13 +93,23 @@ export function Sidebar() {
             <div key={item.href} className="space-y-2">
               <Link
                 href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
                 className={
                   normalizedPathname === normalizePath(item.href)
                     ? "block text-sm text-[var(--color-text-primary)] font-bold"
                     : "block text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
                 }
               >
-                {item.title}
+                <div className="flex items-center gap-2">
+                  {item.title}
+                  {item.external && (
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M14 2L8 8M14 2V5.5M14 2H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
               </Link>
               {item.children && (
                 <div className="ml-4 space-y-2">
