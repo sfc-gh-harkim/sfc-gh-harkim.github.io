@@ -79,7 +79,15 @@ function TableDetailsTab() {
     );
 }
 
-function SingleColContent({ statusBadgeStyle }: { statusBadgeStyle: string | null }) {
+function SingleColContent({ 
+    statusBadgeStyle, 
+    isReviewModalVisible,
+    setIsReviewModalVisible
+}: { 
+    statusBadgeStyle: string | null, 
+    isReviewModalVisible: boolean,
+    setIsReviewModalVisible: (value: boolean) => void 
+}) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const variant = searchParams.get('variant') as 'looping' | 'shimmer' || 'looping';
@@ -90,7 +98,6 @@ function SingleColContent({ statusBadgeStyle }: { statusBadgeStyle: string | nul
         HAROLD: true,
         FAKE_DATA: true,
     });
-    const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
     const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
     const [isGenerateHovered, setIsGenerateHovered] = useState(false);
 
@@ -644,16 +651,26 @@ function SingleColPageContent() {
     const searchParams = useSearchParams();
     const isTestMode = searchParams.get('statusBadge') === '1';
     const [activeStyle, setActiveStyle] = useState<string | null>(null);
+    const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
     
     // Handle style change when a button is clicked
     const handleStyleChange = (style: 'haloShimmer' | 'infoStatic' | 'infoShimmer' | 'remove') => {
-        // Simply update the state - we'll use this to apply classes in the JSX
+        // Update the style state
         setActiveStyle(style === 'remove' ? null : style);
+        
+        // Open the review modal if it's not the remove button
+        if (style !== 'remove') {
+            setIsReviewModalVisible(true);
+        }
     };
     
     return (
         <>
-            <SingleColContent statusBadgeStyle={activeStyle} />
+            <SingleColContent 
+                statusBadgeStyle={activeStyle} 
+                isReviewModalVisible={isReviewModalVisible}
+                setIsReviewModalVisible={setIsReviewModalVisible}
+            />
             
             {isTestMode && (
                 <div className={styles.testPanel}>
@@ -661,19 +678,19 @@ function SingleColPageContent() {
                         className={`${styles.testButton} ${activeStyle === null ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('remove')}
                     >
-                        No Styles
+                        Default
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'infoStatic' ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('infoStatic')}
                     >
-                        Info Status (Static)
+                        Info (Static)
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'infoShimmer' ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('infoShimmer')}
                     >
-                        Info Status (Shimmer)
+                        Info (Shimmer)
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'haloShimmer' ? styles.activeButton : ''}`}
