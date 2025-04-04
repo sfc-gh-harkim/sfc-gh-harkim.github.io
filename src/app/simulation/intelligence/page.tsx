@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import styles from './intelligence.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import type { DotLottie } from '@lottiefiles/dotlottie-web';
 
 // Main export component with Suspense
 export default function IntelligencePage() {
@@ -19,6 +21,7 @@ export default function IntelligencePage() {
 function IntelligenceContent() {
   const searchParams = useSearchParams();
   const isTestMode = searchParams.get('test') === '1';
+  const playerRef = useRef<DotLottie | null>(null);
   
   const [introState, setIntroState] = useState({
     started: false,
@@ -38,29 +41,34 @@ function IntelligenceContent() {
         started: true,
         animate: true
       });
-      
-      // Start setup animation after 2000ms (after intro completes)
-      const setupTimeout = setTimeout(() => {
-        // First fade out the intro background
-        setIntroState({
-          started: true,
-          animate: false
-        });
-        
-        // Then start the setup animation
-        setTimeout(() => {
-          setSetupState({
-            started: true,
-            animate: true
-          });
-        }, 500); // Wait for background to start fading out
-      }, 2000);
-
-      return () => {
-        clearTimeout(setupTimeout);
-      };
     }
   }, []);
+
+  const handleIntroComplete = () => {
+    // First fade out the intro background
+    setIntroState({
+      started: true,
+      animate: false
+    });
+    
+    // Then start the setup animation
+    setTimeout(() => {
+      setSetupState({
+        started: true,
+        animate: true
+      });
+    }, 300); // Wait for background to start fading out
+  };
+
+  const dotLottieRefCallback = (ref: DotLottie | null) => {
+    playerRef.current = ref;
+    if (ref) {
+      if (!introState.animate) {
+        ref.pause();
+      }
+      ref.addEventListener('complete', handleIntroComplete);
+    }
+  };
 
   const restartAnimation = () => {
     // Reset animation states
@@ -82,19 +90,12 @@ function IntelligenceContent() {
       });
       
       setTimeout(() => {
-        setIntroState({
+        setSetupState({
           started: true,
-          animate: false
+          animate: true
         });
-        
-        setTimeout(() => {
-          setSetupState({
-            started: true,
-            animate: true
-          });
-        }, 500);
-      }, 2000);
-    }, 100);
+      }, 500);
+    }, 2000);
   };
 
   // Determine container classes based on animation states
@@ -184,70 +185,85 @@ function IntelligenceContent() {
         </div>
       </aside>
 
-      <main className={`${styles.mainContent} ${setupState.animate ? styles.animate : styles.animatedContent}`}>
-        <div className={styles.animateMask}>
-          <h1 className={styles.greeting}><span className={styles.greetingPt1}>Good afternoon,</span> <span className={styles.greetingPt2}>Jennifer.</span></h1>
-        </div>
-        <div className={styles.animateMask}>
-          <h2 className={styles.subtitle}>What insights are you looking for?</h2>
-        </div>
-
-        <div className={styles.inputContainer}>
-          <textarea
-            className={styles.input}
-            placeholder="How may I assist you?"
-          ></textarea>
-          <button className={styles.micButton}>
-            <Image 
-              src="/assets/intelligence/mic.svg"
-              alt="Microphone"
-              width={24}
-              height={24}
-            />
-          </button>
+      <main className={`${styles.mainContent} ${setupState.animate ? styles.animate : ''}`}>
+        {/* Intelligence Intro Animation */}
+        <div className={styles.introAnimation}>
+          <DotLottieReact
+            src="/assets/intelligence-intro-light.lottie"
+            autoplay={true}
+            loop={false}
+            dotLottieRefCallback={dotLottieRefCallback}
+          />
         </div>
 
-        <div className={styles.suggestedQueries}>
-          <button className={styles.queryButton}>
-            <Image 
-              src="/assets/intelligence/magnifying-glass.svg"
-              alt=""
-              width={16}
-              height={16}
-              className={styles.queryIcon}
-            />
-            Are there any leads I need to follow up with today?
-          </button>
-          <button className={styles.queryButton}>
-            <Image 
-              src="/assets/intelligence/magnifying-glass.svg"
-              alt=""
-              width={16}
-              height={16}
-              className={styles.queryIcon}
-            />
-            What use cases have not been updated?
-          </button>
-          <button className={styles.queryButton}>
-            <Image 
-              src="/assets/intelligence/magnifying-glass.svg"
-              alt=""
-              width={16}
-              height={16}
-              className={styles.queryIcon}
-            />
-            What&apos;s the email and phone number for the account?
-          </button>
-          <button className={styles.queryButton}>
-            <Image 
-              src="/assets/intelligence/magnifying-glass.svg"
-              alt=""
-              width={16}
-              height={16}
-              className={styles.queryIcon}
-            />
-            Has this lead responded to any outreach recently?
-          </button>
+        <div className={setupState.animate ? styles.animate : styles.animatedContent}>
+          <div className={styles.animateMask}>
+            <h1 className={styles.greeting}>
+              <span className={styles.greetingPt1}>Good afternoon,</span> 
+              <span className={styles.greetingPt2}>Jennifer.</span>
+            </h1>
+          </div>
+          <div className={styles.animateMask}>
+            <h2 className={styles.subtitle}>What insights are you looking for?</h2>
+          </div>
+
+          <div className={styles.inputContainer}>
+            <textarea
+              className={styles.input}
+              placeholder="How may I assist you?"
+            ></textarea>
+            <button className={styles.micButton}>
+              <Image 
+                src="/assets/intelligence/mic.svg"
+                alt="Microphone"
+                width={24}
+                height={24}
+              />
+            </button>
+          </div>
+
+          <div className={styles.suggestedQueries}>
+            <button className={styles.queryButton}>
+              <Image 
+                src="/assets/intelligence/magnifying-glass.svg"
+                alt=""
+                width={16}
+                height={16}
+                className={styles.queryIcon}
+              />
+              Are there any leads I need to follow up with today?
+            </button>
+            <button className={styles.queryButton}>
+              <Image 
+                src="/assets/intelligence/magnifying-glass.svg"
+                alt=""
+                width={16}
+                height={16}
+                className={styles.queryIcon}
+              />
+              What use cases have not been updated?
+            </button>
+            <button className={styles.queryButton}>
+              <Image 
+                src="/assets/intelligence/magnifying-glass.svg"
+                alt=""
+                width={16}
+                height={16}
+                className={styles.queryIcon}
+              />
+              What&apos;s the email and phone number for the account?
+            </button>
+            <button className={styles.queryButton}>
+              <Image 
+                src="/assets/intelligence/magnifying-glass.svg"
+                alt=""
+                width={16}
+                height={16}
+                className={styles.queryIcon}
+              />
+              Has this lead responded to any outreach recently?
+            </button>
+          </div>
         </div>
       </main>
       

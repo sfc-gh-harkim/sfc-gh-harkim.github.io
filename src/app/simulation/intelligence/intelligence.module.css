@@ -88,11 +88,22 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   max-width: 780px;
-  margin: 0 auto;
+  margin: auto;
   height: 100vh;
-  overflow: hidden;
+  padding-top: 0;
+  opacity: 1;
+  transform: translateY(calc(860px - 25vh));
+  position: relative;
+}
+
+/* Only hide the content below the intro animation in the initial state */
+.animatedContent .greeting,
+.animatedContent .subtitle,
+.animatedContent .inputContainer,
+.animatedContent .suggestedQueries {
+  opacity: 0;
 }
 
 .greeting {
@@ -114,15 +125,15 @@
   font-size: 40px;
   font-weight: 600;
   color: var(--intelligence-brand-secondary);
-  margin-bottom: 40px;
   line-height: 48px;
   letter-spacing: -1.5px;
+  margin-bottom: 4px;
 }
 
 .inputContainer {
   width: 100%;
   position: relative;
-  margin-bottom: 32px;
+  margin: 32px 0;
 }
 
 .input {
@@ -253,10 +264,10 @@
 
 @keyframes introComplete {
   0% {
-    transform: translateY(180px);
+    transform: translateY(calc(860px - 25vh));
   }
   100% {
-    transform: translateY(0);
+    transform: translateY(calc(25vh));
   }
 }
 
@@ -277,6 +288,15 @@
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -316,10 +336,9 @@
 }
 
 .mainContent.animate {
-  animation: introComplete 1s cubic-bezier(0.5, 0.1, 0.1, 1.0) forwards;
+  animation: introComplete 1.2s cubic-bezier(0.5, 0.1, 0.1, 1.0) forwards;
   animation-delay: 0.75s; /* Comes in after subtitle */
   transform-origin: bottom;
-  transform: translateY(180px);
 }
 
 .animate .inputContainer {
@@ -374,5 +393,44 @@
 }
 
 .replayButton:hover {
+  opacity: 1;
+}
+
+.introAnimation {
+  position: relative;
+  width: 100%;
+  height: 0;
+  opacity: 0;
+}
+
+.introAnimation > div {
+  position: absolute;
+  bottom: -80px;
+  left: -50px;
+  width: 800px !important;
+  height: 800px !important;
+  transform-origin: bottom left;
+}
+
+/* Sync with introComplete animation */
+.animate .introAnimation > div {
+  transition: all 1s cubic-bezier(0.5, 0.1, 0.1, 1.0);
+  transition-delay: 0.8s;
+  bottom: -60px;
+  left: -25px;
+  width: 500px !important;
+  height: 500px !important;
+}
+
+/* Only hide specific elements in the initial state */
+.animatedContent .greeting,
+.animatedContent .subtitle,
+.animatedContent .inputContainer,
+.animatedContent .suggestedQueries {
+  opacity: 0;
+}
+
+/* Don't hide the introAnimation in the initial state */
+.animatedContent .introAnimation {
   opacity: 1;
 }

@@ -678,25 +678,25 @@ function SingleColPageContent() {
                         className={`${styles.testButton} ${activeStyle === null ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('remove')}
                     >
-                        Default
+                        Neutral Status Badge (Previous)
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'infoStatic' ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('infoStatic')}
                     >
-                        Info (Static)
+                        Info Status Badge - Static
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'infoShimmer' ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('infoShimmer')}
                     >
-                        Info (Shimmer)
+                        Info Status Badge - Shimmer
                     </button>
                     <button 
                         className={`${styles.testButton} ${activeStyle === 'haloShimmer' ? styles.activeButton : ''}`}
                         onClick={() => handleStyleChange('haloShimmer')}
                     >
-                        Halo (Shimmer)
+                        Info Status Badge - Halo
                     </button>
                 </div>
             )}
