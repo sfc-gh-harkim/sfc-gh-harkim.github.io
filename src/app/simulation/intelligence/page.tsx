@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useRef } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import styles from './intelligence.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import type { DotLottie } from '@lottiefiles/dotlottie-web';
 
 // Main export component with Suspense
 export default function IntelligencePage() {
@@ -21,11 +19,11 @@ export default function IntelligencePage() {
 function IntelligenceContent() {
   const searchParams = useSearchParams();
   const isTestMode = searchParams.get('test') === '1';
-  const playerRef = useRef<DotLottie | null>(null);
   
   const [introState, setIntroState] = useState({
     started: false,
-    animate: false
+    animate: false,
+    removeMask: false
   });
   
   const [setupState, setSetupState] = useState({
@@ -36,45 +34,36 @@ function IntelligenceContent() {
   useEffect(() => {
     // Make sure we're in client-side environment
     if (typeof window !== 'undefined') {
-      // Start intro animation immediately
+      // Start both animations immediately without delay
       setIntroState({
         started: true,
-        animate: true
+        animate: true,
+        removeMask: false
       });
-    }
-  }, []);
 
-  const handleIntroComplete = () => {
-    // First fade out the intro background
-    setIntroState({
-      started: true,
-      animate: false
-    });
-    
-    // Then start the setup animation
-    setTimeout(() => {
+      // Start setup animation immediately too
       setSetupState({
         started: true,
         animate: true
       });
-    }, 300); // Wait for background to start fading out
-  };
-
-  const dotLottieRefCallback = (ref: DotLottie | null) => {
-    playerRef.current = ref;
-    if (ref) {
-      if (!introState.animate) {
-        ref.pause();
-      }
-      ref.addEventListener('complete', handleIntroComplete);
+      
+      // Apply removeMask animation after mainContent animation finishes
+      // mainContent animation has 0.75s delay and 1.2s duration = 1.95s total
+      setTimeout(() => {
+        setIntroState(prev => ({
+          ...prev,
+          removeMask: true
+        }));
+      }, 1200); // Slightly longer than 1.95s to ensure smooth transition
     }
-  };
+  }, []);
 
   const restartAnimation = () => {
-    // Reset animation states
+    // Reset all states first
     setIntroState({
       started: false,
-      animate: false
+      animate: false,
+      removeMask: false
     });
     
     setSetupState({
@@ -82,20 +71,28 @@ function IntelligenceContent() {
       animate: false
     });
     
-    // Force a reflow and restart animations
-    setTimeout(() => {
+    // Force a reflow before starting new animation
+    requestAnimationFrame(() => {
+      // Start both animations immediately without delay
       setIntroState({
+        started: true,
+        animate: true,
+        removeMask: false
+      });
+      
+      setSetupState({
         started: true,
         animate: true
       });
       
+      // Apply removeMask animation after mainContent animation finishes
       setTimeout(() => {
-        setSetupState({
-          started: true,
-          animate: true
-        });
-      }, 500);
-    }, 2000);
+        setIntroState(prev => ({
+          ...prev,
+          removeMask: true
+        }));
+      }, 1200); // Slightly longer than 1.95s
+    });
   };
 
   // Determine container classes based on animation states
@@ -110,6 +107,34 @@ function IntelligenceContent() {
     <div className={styles.container}>
       {/* Secondary background layer */}
       <div className={`${styles.secondaryBackground} ${introState.animate ? styles.thinkingBGActive : ''}`} />
+      
+      {/* Mobile Header - Only visible on small screens */}
+      <header className={styles.mobileHeader}>
+        <button className={styles.menuButton} aria-label="Open menu">
+          <Image 
+            src="/assets/intelligence/navigation.svg"
+            alt=""
+            width={24}
+            height={24}
+          />
+        </button>
+        <div className={styles.mobileLogo}>
+          <Image 
+            src="/assets/intelligence/logo.svg"
+            alt="Intelligence"
+            width={24}
+            height={24}
+          />
+          intelligence
+        </div>
+        <Image
+          src="/assets/intelligence/avatar.png"
+          alt="Jennifer Reynolds"
+          width={32}
+          height={32}
+          className={styles.mobileAvatar}
+        />
+      </header>
       
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
@@ -186,20 +211,23 @@ function IntelligenceContent() {
       </aside>
 
       <main className={`${styles.mainContent} ${setupState.animate ? styles.animate : ''}`}>
-        {/* Intelligence Intro Animation */}
-        <div className={styles.introAnimation}>
-          <DotLottieReact
-            src="/assets/intelligence-intro-light.lottie"
-            autoplay={true}
-            loop={false}
-            dotLottieRefCallback={dotLottieRefCallback}
+        {/* Static Telescope SVG */}
+        <div className={`${styles.introAnimation} ${introState.animate ? styles.animate : ''}`}>
+          <Image
+            src="/assets/intelligence/telescope-light.svg"
+            alt="Telescope illustration"
+            width={1380}
+            height={1141}
+            priority
+            loading="eager"
+            className={`${styles.telescopeImage} ${introState.removeMask ? styles.removeMask : ''}`}
           />
         </div>
 
-        <div className={setupState.animate ? styles.animate : styles.animatedContent}>
+        <div className={`${styles.searchContainer} ${introState.animate ? styles.animate : styles.animatedContent}`}>
           <div className={styles.animateMask}>
             <h1 className={styles.greeting}>
-              <span className={styles.greetingPt1}>Good afternoon,</span> 
+              <span className={styles.greetingPt1}>Good afternoon,&nbsp;</span> 
               <span className={styles.greetingPt2}>Jennifer.</span>
             </h1>
           </div>
@@ -225,40 +253,40 @@ function IntelligenceContent() {
           <div className={styles.suggestedQueries}>
             <button className={styles.queryButton}>
               <Image 
-                src="/assets/intelligence/magnifying-glass.svg"
+                src="/assets/intelligence/arrow-hook.svg"
                 alt=""
-                width={16}
-                height={16}
+                width={24}
+                height={24}
                 className={styles.queryIcon}
               />
               Are there any leads I need to follow up with today?
             </button>
             <button className={styles.queryButton}>
               <Image 
-                src="/assets/intelligence/magnifying-glass.svg"
+                src="/assets/intelligence/arrow-hook.svg"
                 alt=""
-                width={16}
-                height={16}
+                width={24}
+                height={24}
                 className={styles.queryIcon}
               />
               What use cases have not been updated?
             </button>
             <button className={styles.queryButton}>
               <Image 
-                src="/assets/intelligence/magnifying-glass.svg"
+                src="/assets/intelligence/arrow-hook.svg"
                 alt=""
-                width={16}
-                height={16}
+                width={24}
+                height={24}
                 className={styles.queryIcon}
               />
               What&apos;s the email and phone number for the account?
             </button>
             <button className={styles.queryButton}>
               <Image 
-                src="/assets/intelligence/magnifying-glass.svg"
+                src="/assets/intelligence/arrow-hook.svg"
                 alt=""
-                width={16}
-                height={16}
+                width={24}
+                height={24}
                 className={styles.queryIcon}
               />
               Has this lead responded to any outreach recently?
