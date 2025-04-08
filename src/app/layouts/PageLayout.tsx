@@ -3,13 +3,13 @@ import { Sidebar } from './Sidebar';
 import { usePathname } from 'next/navigation';
 import styles from '@/app/styles/designlab.module.css';
 
-interface ProjectPageTemplateProps {
+interface PageLayoutProps {
     children: React.ReactNode;
 }
 
-export function ProjectPageTemplate({ 
+export function PageLayout({ 
     children
-}: ProjectPageTemplateProps) {
+}: PageLayoutProps) {
     const pathname = usePathname();
     const isHomePage = pathname === '/';
 

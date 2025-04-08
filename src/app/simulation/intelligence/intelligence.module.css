@@ -3,14 +3,17 @@
   --intelligence-brand-secondary: #76A1B1;
   --intelligence-text-primary: #222527;
   --intelligence-text-secondary: #4B5563;
+  --intelligence-text-inverse: #FFFFFF;
   --intelligence-background-primary: #FFFFFF;
   --intelligence-background-secondary: rgba(0, 0, 0, 0.02);
+  --intelligence-background-action: var(--intelligence-brand-secondary);
   --intelligence-border-primary: #E2E2E2;
   --intelligence-border-active: #C5D8DF;
   --intelligence-input-bg: rgba(0, 0, 0, 0.04);
   --intelligence-hover-bg: rgba(0, 0, 0, 0.02);
   
   display: flex;
+  padding-left: 280px;
   min-height: 100vh;
   overflow: hidden;
   position: relative;
@@ -42,7 +45,10 @@
 
 .sidebar {
   z-index: 1;
+  position: fixed;
+  left: 0;
   width: 280px;
+  height: 100%;
   padding: 40px 32px;
   display: flex;
   flex-direction: column;
@@ -116,6 +122,7 @@
   line-height: 48px;
   letter-spacing: -1.5px;
   overflow: hidden;
+  opacity: 1;
 }
 
 .greetingPt1, .greetingPt2 {
@@ -143,6 +150,7 @@
   height: 120px;
   padding: 20px;
   padding-right: 56px;
+  padding-bottom: 48px;
   border-radius: 12px;
   border: 1px solid var(--intelligence-border-primary);
   background-color: var(--intelligence-input-bg);
@@ -152,6 +160,7 @@
   vertical-align: top;
   resize: none;
   transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
 }
 
 .input:focus {
@@ -166,17 +175,91 @@
 .input::placeholder {
   color: var(--intelligence-text-secondary);
   vertical-align: top;
+  font-family: 'Inter', sans-serif;
+}
+
+.inputControls {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 14px;
+  width: auto;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  z-index: 10;
 }
 
 .micButton {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
+  right: 12px;
+  bottom: 14px;
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px;
   color: var(--intelligence-text-secondary);
+}
+
+.sendButton {
+  background-color: var(--intelligence-background-action);
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; 
+  margin-left: auto;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  color: var(--intelligence-text-inverse);
+}
+
+.sendButton svg {
+  color: var(--intelligence-text-inverse);
+}
+
+.sendButton:hover {
+  transform: scale(1.05);
+}
+
+.sendButton:active {
+  transform: scale(0.95);
+}
+
+.inputOptions {
+  display: flex;
+  gap: 8px;
+}
+
+.inputOptionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--intelligence-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.inputOptionItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.inputOptionItem svg {
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.inputOptionItem span {
+  margin-top: 1px;
 }
 
 .suggestedQueries {
@@ -275,12 +358,12 @@
 
 @keyframes revealFromBottom {
   0% {
-    transform: translateY(60px);
-    opacity: 1;
+    opacity: 0;
+    transform: translateY(20px);
   }
   100% {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -314,97 +397,66 @@
 /* Animation Classes */
 .animatedContent {
   opacity: 0;
+  width: 100%;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-.animateMask {
-  overflow: hidden;
+.animate .animatedContent {
+  opacity: 1;
+  visibility: visible;
 }
 
-.animatedContent .greetingPt1,
-.animatedContent .greetingPt2,
-.animatedContent .subtitle,
-.animatedContent .inputContainer,
-.animatedContent .queryButton {
+.animate .greetingPt1, 
+.animate .greetingPt2 {
   opacity: 0;
+  animation: revealFromBottom 0.6s ease-out forwards;
+  visibility: visible;
 }
 
 .animate .greetingPt1 {
-  animation: revealFromBottom 2s cubic-bezier(0.1, 1.0, 0.1, 1.0) forwards;
-  transform-origin: bottom;
+  animation-delay: 0.3s;
 }
 
 .animate .greetingPt2 {
-  animation: revealFromBottom 2s cubic-bezier(0.1, 1.0, 0.1, 1.0) forwards;
-  animation-delay: 0.1s; /* Comes in after greeting Pt1 */
-  transform-origin: bottom;
+  animation-delay: 0.5s;
 }
 
 .animate .subtitle {
-  animation: revealFromBottom 2s cubic-bezier(0.1, 1.0, 0.1, 1.0) forwards;
-  animation-delay: 0.5s; /* Comes in after full greeting */
-  transform-origin: bottom;
   opacity: 0;
+  animation: revealFromBottom 0.6s ease-out 0.6s forwards;
+}
+
+.animate .inputContainer {
+  opacity: 0;
+  animation: revealFromBottom 0.6s ease-out 0.9s forwards;
+}
+
+.animate .queryButton {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out 1.2s forwards;
+}
+
+/* Remove conflicting rules */
+.animatedContent .greeting,
+.animatedContent .subtitle,
+.animatedContent .inputContainer,
+.animatedContent .suggestedQueries {
+  visibility: hidden;
+}
+
+/* Only show elements when animate class is present */
+.animate .animatedContent .greeting,
+.animate .animatedContent .subtitle,
+.animate .animatedContent .inputContainer,
+.animate .animatedContent .suggestedQueries {
+  visibility: visible;
 }
 
 .mainContent.animate {
   animation: introComplete 1.2s cubic-bezier(0.5, 0.1, 0.1, 1.0) forwards;
   animation-delay: 0.75s; /* Comes in after subtitle */
   transform-origin: bottom;
-}
-
-.animate .inputContainer {
-  animation: fadeIn 0.3s ease-out forwards;
-  animation-delay: 1s; /* Starts after subtitle (0.2s + 0.2s) */
-  opacity: 0;
-}
-
-.animate .queryButton:nth-child(1) {
-  animation: fadeIn 0.3s ease-out forwards;
-  animation-delay: 1.1s; /* Starts after input (0.4s + 0.2s) */
-  opacity: 0;
-}
-
-.animate .queryButton:nth-child(2) {
-  animation: fadeIn 0.3s ease-out forwards;
-  animation-delay: 1.2s; /* 0.1s stagger */
-  opacity: 0;
-}
-
-.animate .queryButton:nth-child(3) {
-  animation: fadeIn 0.3s ease-out forwards;
-  animation-delay: 1.3s; /* 0.1s stagger */
-  opacity: 0;
-}
-
-.animate .queryButton:nth-child(4) {
-  animation: fadeIn 0.3s ease-out forwards;
-  animation-delay: 1.4s; /* 0.1s stagger */
-  opacity: 0;
-}
-
-.replayButton {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--intelligence-primary);
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-  font-size: 18px;
-}
-
-.replayButton:hover {
-  opacity: 1;
 }
 
 .introAnimation {
@@ -514,6 +566,7 @@
   .container {
     flex-direction: column;
     padding-top: 72px;
+    padding-left: 0;
     overflow-y: scroll;
   }
 
@@ -530,7 +583,6 @@
     margin: 0 auto;
     padding: 0 20px 20px;
     width: 100%;
-    max-width: 100%;
     transform: translateY(calc(720px - 35vh));
   }
   
@@ -560,6 +612,23 @@
     max-width: none;
   }
   
+  .inputContainer {
+    margin: 24px 0 52px;
+  }
+  
+  .inputControls {
+    position: absolute;
+    bottom: -46px;
+    left: 4px;
+    width: calc(100% - 8px);
+    background-color: transparent;
+  }
+  
+  .inputOptions {
+    width: 100%;
+    gap: 12px;
+  }
+  
   .input {
     height: 56px;
     min-height: 56px;
@@ -578,15 +647,15 @@
     line-height: 24px;
   }
   
-  .micButton {
-    top: 50%;
-    transform: translateY(-50%);
-    bottom: auto;
-    right: 16px;
+  .micButton, .sendButton {
+    position: static;
+    transform: none;
   }
-
-  .inputContainer {
-    margin: 24px 0;
+  
+  .sendButton {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
   }
 }
 
@@ -607,4 +676,333 @@
     font-size: 30px;
     line-height: 36px;
   }
+}
+
+/* Hide initial content when in chat mode */
+.hidden {
+  display: none;
+}
+
+/* Chat active styling */
+.chatActive {
+  transform: translateY(0) !important;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.chatActive .inputContainer {
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 882px;
+  margin: 0 auto;
+  z-index: 50;
+  transition: all 0.2s ease-out;
+}
+
+.chatActive .greeting,
+.chatActive .subtitle,
+.chatActive .suggestedQueries {
+  display: none;
+}
+
+/* Chat container */
+.chatContainer {
+  width: 100%;
+  height: calc(100vh - 180px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 100px;
+  animation: fadeIn 0.3s ease-out forwards;
+  justify-content: flex-end;
+  padding-top: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Message styles */
+.message {
+  padding: 12px 16px;
+  max-width: 600px;
+  border-radius: 8px;
+  line-height: 1.5;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+.userMessage {
+  max-width: 600px;
+  background-color: var(--intelligence-input-bg);
+  color: var(--intelligence-text-primary);
+  align-self: flex-end;
+  border-radius: 12px;
+}
+
+.aiMessage {
+  background-color: var(--intelligence-background-secondary);
+  color: var(--intelligence-text-primary);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+}
+
+.codeMessage {
+  color: var(--intelligence-text-primary);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+  font-family: monospace;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.inlineCode {
+  margin: 0;
+  padding: 8px;
+  white-space: pre-wrap;
+  color: var(--intelligence-text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* AI Response styling */
+.aiResponse {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.responseIcon {
+  flex-shrink: 0;
+}
+
+.responseContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.responseHeader {
+  font-weight: 600;
+  color: var(--intelligence-text-primary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.responseText {
+  color: var(--intelligence-text-primary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Code block */
+.codeBlock {
+  margin-left: 32px;
+  width: calc(100% - 32px);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--intelligence-background-secondary);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  font-family: monospace;
+}
+
+.codeHeader {
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  color: var(--intelligence-text-secondary);
+  font-size: 14px;
+}
+
+.codeActions {
+  display: flex;
+  gap: 8px;
+}
+
+.codeAction {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.code {
+  padding: 16px;
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--intelligence-text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Input footer for chat mode */
+.inputFooter {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: -46px;
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.inputFooterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--intelligence-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.inputFooterItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Mobile styles for chat interface */
+@media (max-width: 768px) {
+  .chatActive .inputContainer {
+    padding: 0 16px;
+    bottom: 16px;
+  }
+  
+  .chatContainer {
+    margin-bottom: 80px;
+  }
+  
+  .message {
+    max-width: 90%;
+    font-size: 15px;
+  }
+  
+  .responseHeader, .responseText {
+    font-size: 15px;
+  }
+  
+  .inputFooter {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .message {
+    max-width: 95%;
+    font-size: 14px;
+  }
+  
+  .responseHeader, .responseText {
+    font-size: 14px;
+  }
+  
+  .code {
+    font-size: 13px;
+  }
+}
+
+/* Container with chat active */
+.chatActiveContainer {
+  overflow-y: auto !important;
+}
+
+/* Hide initial content when in chat mode */
+.hidden {
+  display: none !important;
+}
+
+/* Fade out animation for greeting and subtitle */
+.fadeOut {
+  animation: fadeOutContent 0.5s ease-out forwards;
+}
+
+@keyframes fadeOutContent {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+    display: none;
+  }
+}
+
+/* Chat active styling */
+.chatActive {
+  transform: translateY(0) !important;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.persistInput {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 20px;
+  z-index: 50;
+  animation: slideUpInput 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  background-color: var(--intelligence-background-primary);
+}
+
+/* Fix for animateMask items to ensure they're visible before submission */
+.animatedContent {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.animate .animatedContent {
+  opacity: 1;
+  visibility: visible;
+}
+
+.animatedContent .greeting,
+.animatedContent .subtitle,
+.animatedContent .inputContainer,
+.animatedContent .suggestedQueries {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Fix for input and query buttons to ensure they're visible properly during animations */
+.animate .inputContainer,
+.animate .suggestedQueries {
+  animation: revealFromBottom 0.6s ease-out 0.9s forwards;
+}
+
+.animate .queryButton {
+  animation: fadeIn 0.6s ease-out 1.2s forwards;
+}
+
+/* Remove old properties that are now handled by our new classes */
+.chatActive .inputContainer {
+  background-color: var(--intelligence-background-primary);
+}
+
+@media (max-width: 768px) {
+  .persistInput {
+    padding: 0 16px;
+    bottom: 16px;
+  }
+}
+
+.chatActive .mainContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }

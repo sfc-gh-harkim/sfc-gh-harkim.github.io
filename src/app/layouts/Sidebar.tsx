@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import styles from '@/app/styles/designlab.module.css';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface SidebarItem {
   title: string;
@@ -43,6 +44,7 @@ const sidebarItems: SidebarItem[] = [
 export function Sidebar() {
   const pathname = usePathname();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const { isAuthenticated, logout } = useAuth();
   
   // Normalize paths by removing trailing slashes except for root
   const normalizePath = (path: string) => {
@@ -131,6 +133,21 @@ export function Sidebar() {
             </div>
           ))}
         </nav>
+        
+        {isAuthenticated && pathname === '/' && (
+          <div className="mt-4 pt-4">
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors py-2"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M16 17L21 12L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

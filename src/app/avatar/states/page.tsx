@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { ProjectPageTemplate } from '../../layouts/ProjectPageTemplate';
+import { PageLayout } from '../../layouts/PageLayout';
 import styles from './page.module.css';
 
 export default function StatesPage() {
     return (
-        <ProjectPageTemplate>
+        <PageLayout>
             <div className={styles.lottieContainer}>
                 <div className={styles.lottieWrapper}>
                     <h3>Open State</h3>
@@ -37,6 +37,6 @@ export default function StatesPage() {
                     />
                 </div>
             </div>
-        </ProjectPageTemplate>
+        </PageLayout>
     );
 } 

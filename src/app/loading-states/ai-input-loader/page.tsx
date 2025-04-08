@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ProjectPageTemplate } from '@/app/layouts/ProjectPageTemplate';
+import { PageLayout } from '@/app/layouts/PageLayout';
 import { BaseAIInputLoader } from './BaseAIInputLoader';
 import { ControlBar } from '@/app/layouts/ControlBar';
 import styles from '@/app/styles/designlab.module.css';
@@ -25,7 +25,7 @@ export default function AIInputLoaderPage() {
 
     return (
         <>
-            <ProjectPageTemplate>
+            <PageLayout>
                 <div className={styles.loaderContainer}>
                     <BaseAIInputLoader 
                         variant={activeVariant}
@@ -36,7 +36,7 @@ export default function AIInputLoaderPage() {
                         onGenerateClick={handleGenerateClick}
                     />
                 </div>
-            </ProjectPageTemplate>
+            </PageLayout>
             <ControlBar>
                 <div className={styles.controlSection}>
                     <h3 className={styles.controlSectionTitle}>Variant</h3>

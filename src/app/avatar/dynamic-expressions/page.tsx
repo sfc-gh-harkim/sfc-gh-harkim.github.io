@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { ProjectPageTemplate } from '../../layouts/ProjectPageTemplate';
+import { PageLayout } from '../../layouts/PageLayout';
 import { AnimatedAvatar } from '@/app/components/AnimatedAvatar';
 import styles from './page.module.css';
 import designStyles from '@/app/styles/designlab.module.css';
@@ -25,7 +25,7 @@ export default function DynamicExpressionsPage() {
     }, []);
 
     return (
-        <ProjectPageTemplate>
+        <PageLayout>
             <div className={styles.container}>
                 <div style={{ 
                     display: 'flex',
@@ -71,6 +71,6 @@ export default function DynamicExpressionsPage() {
                     </div>
                 </div>
             </div>
-        </ProjectPageTemplate>
+        </PageLayout>
     );
 } 
