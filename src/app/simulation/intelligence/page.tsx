@@ -1,10 +1,336 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef, useCallback } from 'react';
 import styles from './intelligence.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatedAvatar } from '../../components/AnimatedAvatar';
+
+// Generic Streamer Component for text and code animation
+interface GenericStreamerProps {
+  content: string;
+  speed?: number;
+  isComplete?: boolean;
+  isStreaming: boolean;
+  onComplete?: () => void;
+  contentType: 'text' | 'code';
+}
+
+const GenericStreamer: React.FC<GenericStreamerProps> = ({ 
+  content, 
+  speed = 20, 
+  isComplete = false,
+  isStreaming,
+  onComplete,
+  contentType
+}) => {
+  const [renderedItems, setRenderedItems] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [items, setItems] = useState<string[]>([]);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const batchSize = useRef(5); // Number of items to process per batch
+  
+  // Split content into words or lines when it changes
+  useEffect(() => {
+    if (!content) return;
+    
+    // Split content differently based on type
+    const itemsList = contentType === 'text' 
+      ? content.match(/(\S+|\s+)/g) || [] // Split text by words but preserve spaces
+      : content.split('\n'); // Split code by lines
+    
+    setItems(itemsList);
+    
+    // Reset streamer state when content changes
+    if (isComplete) {
+      setRenderedItems(itemsList);
+      setCurrentIndex(itemsList.length);
+      onComplete?.();
+    } else {
+      setRenderedItems([]);
+      setCurrentIndex(0);
+    }
+  }, [content, isComplete, onComplete, contentType]);
+  
+  // Handle streaming effect with improved chunking
+  useEffect(() => {
+    if (!isStreaming || currentIndex >= items.length || isComplete) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (currentIndex >= items.length && onComplete) {
+        onComplete();
+      }
+      return;
+    }
+    
+    // Process words in small batches to ensure smooth streaming
+    const processBatch = () => {
+      const endIndex = Math.min(currentIndex + batchSize.current, items.length);
+      const batch = items.slice(currentIndex, endIndex);
+      
+      setRenderedItems(prev => [...prev, ...batch]);
+      setCurrentIndex(endIndex);
+      
+      // Adjust batch size based on content length to ensure consistent streaming experience
+      if (items.length > 100 && currentIndex > items.length / 3) {
+        // Maintain a more consistent streaming rate for longer content
+        batchSize.current = Math.max(1, Math.floor(items.length / 100));
+      }
+    };
+    
+    timeoutRef.current = setTimeout(processBatch, 
+      // Vary the speed slightly to make the animation feel more natural
+      speed * (0.8 + Math.random() * 0.4)
+    );
+    
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [currentIndex, items, speed, isStreaming, isComplete, onComplete]);
+  
+  if (contentType === 'text') {
+    return (
+      <div className={styles.streamedTextContainer}>
+        {renderedItems.map((word, index) => (
+          <span 
+            key={index} 
+            className={styles.streamedWord}
+            style={{
+              display: /^\s+$/.test(word) ? 'inline' : 'inline-block',
+              color: 'inherit',
+              animationDelay: `${index * 10}ms` // Stagger the fade-in animation slightly
+            }}
+          >
+            {word}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  
+  return (
+    <div className={styles.streamedCodeContainer}>
+      {renderedItems.map((line, index) => (
+        <div 
+          key={index} 
+          className={styles.streamedLine}
+          style={{
+            animationDelay: `${Math.min(index * 5, 200)}ms` // Cap the delay for very long code
+          }}
+        >
+          {line}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Message Item Component
+interface MessageItemProps {
+  message: {
+    type: string;
+    text: string;
+    id?: number;
+  };
+  lastMessageId: number | null;
+  responseState: 'idle' | 'searching' | 'streaming' | 'complete';
+}
+
+const MessageItem: React.FC<MessageItemProps> = ({ message, lastMessageId, responseState }) => {
+  if (message.type === 'user') {
+    return (
+      <div className={styles.userMessage}>
+        <div className={`${styles.message} ${
+          message.id === lastMessageId ? 
+          `${styles.userMessageHighlighted} ${responseState === 'searching' ? styles.searching : ''}` : ''
+        }`}>
+          {message.text}
+        </div>
+      </div>
+    );
+  }
+
+  if (message.type === 'ai') {
+    return (
+      <div className={styles.aiResponse}>
+        <div className={styles.responseIcon}>
+          <AnimatedAvatar
+            width={24}
+            height={24}
+            className={styles.avatar}
+            isPlaying={false}
+            isOutput={true}
+          />
+        </div>
+        <div className={styles.responseContent}>
+          <div className={styles.responseHeader}>
+            <GenericStreamer 
+              content={message.text.split('\n\n')[0]} 
+              isStreaming={false}
+              isComplete={true}
+              speed={0}
+              contentType="text"
+            />
+          </div>
+          <div className={styles.responseText}>
+            <GenericStreamer 
+              content={message.text.split('\n\n')[1] || ''} 
+              isStreaming={false}
+              isComplete={true}
+              speed={0}
+              contentType="text"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (message.type === 'code') {
+    return (
+      <div className={styles.codeMessage}>
+        <div className={styles.codeBlock}>
+          <div className={styles.codeHeader}>
+            <span>sql</span>
+            <div className={styles.codeActions}>
+              <button className={styles.codeAction}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4V20M4 12H20" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+              <button className={styles.codeAction}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 12H20M12 4L20 12L12 20" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <pre className={styles.code}>
+            <GenericStreamer 
+              content={message.text} 
+              isStreaming={false}
+              isComplete={true}
+              speed={0}
+              contentType="code"
+            />
+          </pre>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+// Active Response Component
+interface ActiveResponseProps {
+  responseState: 'idle' | 'searching' | 'streaming' | 'complete';
+  streamedHeader: string;
+  streamedText: string;
+  avatarComplete: boolean;
+}
+
+const ActiveResponse: React.FC<ActiveResponseProps> = ({ 
+  responseState, 
+  streamedHeader, 
+  streamedText, 
+  avatarComplete 
+}) => {
+  if (responseState !== 'searching' && responseState !== 'streaming') return null;
+  
+  return (
+    <div className={styles.aiResponse}>
+      <div className={styles.responseIcon}>
+        <AnimatedAvatar
+          width={24}
+          height={24}
+          className={styles.avatar}
+          isPlaying={responseState === 'searching'}
+          isStopping={avatarComplete}
+          onComplete={() => {
+            console.log('Avatar animation completed');
+          }}
+        />
+      </div>
+      <div className={styles.responseContent}>
+        <div className={styles.responseHeader}>
+          {responseState === 'searching' && (
+            <span className={styles.shimmerText}>Searching data sources<span className={styles.ellipsis}></span></span>
+          )}
+          {responseState === 'streaming' && (
+            <GenericStreamer 
+              content={streamedHeader} 
+              isStreaming={true} 
+              isComplete={false}
+              speed={40}
+              contentType="text"
+            />
+          )}
+        </div>
+        {responseState === 'streaming' && (
+          <div className={styles.responseText}>
+            <GenericStreamer 
+              content={streamedText} 
+              isStreaming={true}
+              isComplete={false}
+              speed={20}
+              contentType="text"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Streaming Code Component
+interface StreamingCodeProps {
+  streamingCode: boolean;
+  streamedCode: string;
+  codeComplete: boolean;
+}
+
+const StreamingCode: React.FC<StreamingCodeProps> = ({ 
+  streamingCode, 
+  streamedCode, 
+  codeComplete 
+}) => {
+  if (!streamingCode) return null;
+  
+  return (
+    <div className={styles.codeMessage}>
+      <div className={styles.codeBlock}>
+        <div className={styles.codeHeader}>
+          <span>sql</span>
+          <div className={styles.codeActions}>
+            <button className={styles.codeAction}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 4V20M4 12H20" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+            <button className={styles.codeAction}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M4 12H20M12 4L20 12L12 20" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <pre className={styles.code}>
+          <GenericStreamer 
+            content={streamedCode} 
+            isStreaming={streamingCode}
+            isComplete={codeComplete}
+            speed={10}
+            contentType="code"
+          />
+        </pre>
+      </div>
+    </div>
+  );
+};
 
 // Main export component with Suspense
 export default function IntelligencePage() {
@@ -34,7 +360,7 @@ function IntelligenceContent() {
   const [messages, setMessages] = useState<Array<{type: string; text: string; id?: number}>>([]);
   
   // Combine all response states into a single state
-  const [responseState, setResponseState] = useState('idle'); // idle, searching, streaming, complete
+  const [responseState, setResponseState] = useState<'idle' | 'searching' | 'streaming' | 'complete'>('idle');
   const [streamedText, setStreamedText] = useState('');
   const [streamedHeader, setStreamedHeader] = useState('');
   const [streamingCode, setStreamingCode] = useState(false);
@@ -63,20 +389,6 @@ function IntelligenceContent() {
     // Debug logging
     console.log('Response state changed:', responseState);
   }, [responseState]);
-  
-  // Update the messages array with received data once streaming is complete
-  useEffect(() => {
-    // Add completed responses to the message array
-    if (responseState === 'idle' && streamedHeader && streamedText && !streamingCode && avatarComplete) {
-      const fullText = `${streamedHeader}\n\n${streamedText}`;
-      
-      setMessages(prev => [...prev, { type: 'ai', text: fullText }]);
-      
-      // Reset streaming states
-      setStreamedHeader('');
-      setStreamedText('');
-    }
-  }, [responseState, streamedHeader, streamedText, streamingCode, avatarComplete]);
   
   // Define type for factoids
   interface Factoid {
@@ -226,83 +538,60 @@ LIMIT 5;`,
   };
 
   const streamCode = (codeToStream: string, resultsToStream?: string) => {
-    let currentCode = '';
-    const fullCode = codeToStream;
-    const codeInterval = setInterval(() => {
-      if (currentCode.length < fullCode.length) {
-        currentCode = fullCode.substring(0, currentCode.length + 2);
-        setStreamedCode(currentCode);
-        scrollToBottom(); // Scroll as code is streamed
-      } else {
-        clearInterval(codeInterval);
+    // Set the code to be streamed
+    setStreamedCode(codeToStream);
+    
+    // Calculate estimated timing for animation
+    const lineCount = codeToStream.split('\n').length;
+    const codeAnimationTime = lineCount * 10 + 500; // Animation time plus buffer
+    
+    setTimeout(() => {
+      // If there are results, add them to the code
+      if (resultsToStream) {
+        setStreamedCode(`${codeToStream}\n\n${resultsToStream}`);
         
-        // If there are results, stream them after a brief pause
-        if (resultsToStream) {
-          setTimeout(() => {
-            let currentResults = '';
-            const resultsInterval = setInterval(() => {
-              if (currentResults.length < resultsToStream.length) {
-                currentResults = resultsToStream.substring(0, currentResults.length + 4);
-                setStreamedCode(fullCode + '\n\n' + currentResults);
-                scrollToBottom(); // Scroll as results are streamed
-              } else {
-                clearInterval(resultsInterval);
-                setStreamingCode(false);
-                setCodeComplete(true);
-                setAvatarComplete(true); // Mark avatar animation as complete
-                
-                // Add complete code with results to messages list
-                const fullCodeWithResults = fullCode + '\n\n' + resultsToStream;
-                setMessages(prev => {
-                  const newMessages = [...prev, { type: 'code', text: fullCodeWithResults }];
-                  
-                  // Schedule scroll to bottom on next render
-                  setTimeout(scrollToBottom, 0);
-                  
-                  return newMessages;
-                });
-              }
-            }, 5); // Faster streaming for results
-          }, 300); // Pause before showing results
-        } else {
-          setStreamingCode(false);
-          setCodeComplete(true);
-          setAvatarComplete(true); // Mark avatar animation as complete
-          
-          // Add code to messages list
-          setMessages(prev => {
-            const newMessages = [...prev, { type: 'code', text: fullCode }];
-            
-            // Schedule scroll to bottom on next render
-            setTimeout(scrollToBottom, 0);
-            
-            return newMessages;
-          });
-        }
+        // Wait for results animation to complete
+        const resultsLineCount = resultsToStream.split('\n').length;
+        const totalAnimationTime = resultsLineCount * 10 + 500;
+        
+        setTimeout(completeCodeStream, totalAnimationTime, codeToStream, resultsToStream);
+      } else {
+        // No results, just complete the code stream
+        completeCodeStream(codeToStream);
       }
-    }, 20);
+    }, codeAnimationTime);
+  };
+  
+  // Helper function to finalize code streaming
+  const completeCodeStream = (code: string, results?: string) => {
+    const finalText = results ? `${code}\n\n${results}` : code;
+    
+    // Update all states 
+    setStreamingCode(false);
+    setCodeComplete(true);
+    setAvatarComplete(true);
+    setResponseState('idle');
+    setStreamedHeader('');
+    setStreamedText('');
+    
+    // Add code to messages list
+    setMessages(prev => [...prev, { type: 'code', text: finalText }]);
+    
+    // Scroll chat to bottom
+    scrollToBottom();
   };
 
   const handleSubmit = () => {
-    if (!inputText.trim()) return;
+    // Disable submission if we're already processing a response
+    if (!inputText.trim() || responseState === 'searching' || responseState === 'streaming' || streamingCode) return;
     
-    // Add user message
-    setMessages(prev => {
-      // Use callback to ensure we're working with the latest state
-      const newMessageId = Date.now(); // Generate a unique ID based on timestamp
-      const newMessages = [...prev, { type: 'user', text: inputText, id: newMessageId }];
-      
-      // Store the ID of the last message for highlighting
-      setLastMessageId(newMessageId);
-      
-      // Schedule scroll to bottom on next render after state update
-      setTimeout(scrollToBottom, 0);
-      
-      return newMessages;
-    });
+    // Add user message and reset input
+    const newMessageId = Date.now();
+    setMessages(prev => [...prev, { type: 'user', text: inputText, id: newMessageId }]);
+    setLastMessageId(newMessageId);
     setInputText('');
     
-    // Apply overflow-y scroll to container if not already active
+    // Activate chat mode if not already active
     if (!chatActive) {
       setChatActive(true);
       document.querySelector(`.${styles.container}`)?.classList.add(styles.chatActiveContainer);
@@ -314,86 +603,101 @@ LIMIT 5;`,
     setStreamedText('');
     setStreamingCode(false);
     setCodeComplete(false);
+    setAvatarComplete(false);
     
     // Reset animation key to force re-animation
     setBgAnimationKey(prev => prev + 1);
     
-    // Use a factoid if this is a subsequent submission (chat already active)
+    // Select appropriate response
     const responseToUse = chatActive 
       ? databaseFactoids[Math.floor(Math.random() * databaseFactoids.length)]
       : mockResponse;
     
     // Show "Searching data sources..." for 3 seconds before streaming response
     setTimeout(() => {
-      // Start transition to streaming state after searching is complete
+      // Start streaming response
       setResponseState('streaming');
-      scrollToBottom(); // Scroll when searching message appears
+      setStreamedHeader(responseToUse.header);
+      setLastMessageId(null); // Clear highlighting
       
-      // First stream the header
-      let currentHeader = '';
-      const fullHeader = responseToUse.header;
-      const headerInterval = setInterval(() => {
-        if (currentHeader.length < fullHeader.length) {
-          currentHeader = fullHeader.substring(0, currentHeader.length + 2);
-          setStreamedHeader(currentHeader);
-          scrollToBottom(); // Scroll as header is typed
-        } else {
-          clearInterval(headerInterval);
+      // Scroll to ensure visibility
+      scrollToBottom();
+      
+      // Start body text after a delay
+      setTimeout(() => {
+        setStreamedText(responseToUse.text);
+        // More accurate time estimation based on text length and batch size
+        const wordCount = responseToUse.text.split(/\s+/).length;
+        const estimatedTime = Math.max(2000, wordCount * 10); // Ensure minimum time
+        
+        // Wait for text completion, then add to message history
+        setTimeout(() => {
+          setResponseState('complete');
+          setAvatarComplete(true);
           
-          // Clear the last message highlight when header is complete
-          setLastMessageId(null);
-          
-          // Now stream the text after header is complete
-          let currentText = '';
-          const fullResponse = responseToUse.text;
-          const textInterval = setInterval(() => {
-            if (currentText.length < fullResponse.length) {
-              currentText = fullResponse.substring(0, currentText.length + 3);
-              setStreamedText(currentText);
-              scrollToBottom(); // Scroll as response text is typed
-            } else {
-              clearInterval(textInterval);
-              setResponseState('complete');
-              setAvatarComplete(true); // Mark avatar animation as complete
-              
-              // Add AI response to messages
-              setMessages(prev => {
-                const newMessages = [...prev, { 
-                  type: 'ai', 
-                  text: `${fullHeader}\n\n${fullResponse}` 
-                }];
-                
-                // Schedule scroll to bottom on next render
-                setTimeout(scrollToBottom, 0);
-                
-                return newMessages;
-              });
-              
-              // Always show the code block for any response
-              setStreamingCode(true);
-              // If the response has results, show them too
-              if ('results' in responseToUse) {
-                streamCode(responseToUse.code, responseToUse.results as string);
-              } else {
-                streamCode(responseToUse.code);
-              }
-              
-              // Final scroll after everything is complete
-              scrollToBottom();
+          // Add AI response to messages
+          setMessages(prev => [
+            ...prev, 
+            { 
+              type: 'ai', 
+              text: `${responseToUse.header}\n\n${responseToUse.text}` 
             }
-          }, 30);
-        }
-      }, 40); // Slightly faster header typing speed
-    }, 3000); // 3 second delay to show searching state
+          ]);
+          
+          // Start code streaming
+          setStreamingCode(true);
+          if ('results' in responseToUse) {
+            streamCode(responseToUse.code, responseToUse.results as string);
+          } else {
+            streamCode(responseToUse.code);
+          }
+          
+          scrollToBottom();
+        }, estimatedTime);
+      }, 1000);
+    }, 3000);
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent Enter key submission if we're already processing a response
     if (e.key === 'Enter' && !e.shiftKey) {
+      if (responseState === 'searching' || responseState === 'streaming' || streamingCode) {
+        e.preventDefault(); // Prevent default behavior but allow typing
+        return;
+      }
       e.preventDefault();
       handleSubmit();
     }
   };
 
+  // Function to reset to home state
+  const resetToHome = useCallback((e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    
+    // Reset to resting state (after intro)
+    setChatActive(false);
+    setMessages([]);
+    setInputText('');
+    setResponseState('idle');
+    setStreamedHeader('');
+    setStreamedText('');
+    setStreamingCode(false);
+    setStreamedCode('');
+    setCodeComplete(false);
+    
+    // Make sure intro animation is complete
+    setIntroState({
+      started: true,
+      animate: true,
+      removeMask: true
+    });
+    
+    setSetupState({
+      started: true,
+      animate: true
+    });
+  }, []);
+  
   useEffect(() => {
     // Make sure we're in client-side environment
     if (typeof window !== 'undefined') {
@@ -448,24 +752,20 @@ LIMIT 5;`,
     }
   }, [responseState]);
 
-  // Determine container classes based on animation states
-  const containerClasses = [styles.container];
-  
-  // Add gradient background class if in animation state
-  if (introState.animate) {
-    containerClasses.push(styles.thinkingBGActive);
-  }
+  // Determine background class based on current state
+  const getBackgroundClass = () => {
+    if (responseState === 'searching') return styles.searchingBG;
+    if (responseState === 'streaming') return styles.streamingBG;
+    if (introState.animate) return styles.thinkingBGActive;
+    return '';
+  };
 
   return (
     <div className={styles.container}>
       {/* Secondary background layer */}
       <div 
         key={bgAnimationKey}
-        className={`${styles.secondaryBackground} ${
-          responseState === 'searching' ? styles.searchingBG : 
-          responseState === 'streaming' ? styles.streamingBG : 
-          introState.animate ? styles.thinkingBGActive : ''
-        }`} 
+        className={`${styles.secondaryBackground} ${getBackgroundClass()}`} 
       />
       
       {/* Mobile Header - Only visible on small screens */}
@@ -479,29 +779,7 @@ LIMIT 5;`,
           />
         </button>
         <div className={styles.mobileLogo}
-          onClick={(e) => {
-            e.preventDefault();
-            // Reset to resting state (after intro)
-            setChatActive(false);
-            setMessages([]);
-            setInputText('');
-            setResponseState('idle');
-            setStreamedHeader('');
-            setStreamedText('');
-            setStreamingCode(false);
-            setStreamedCode('');
-            setCodeComplete(false);
-            // Make sure intro animation is complete
-            setIntroState({
-              started: true,
-              animate: true,
-              removeMask: true
-            });
-            setSetupState({
-              started: true,
-              animate: true
-            });
-          }}
+          onClick={resetToHome}
           style={{ cursor: 'pointer' }}
         >
           <Image 
@@ -523,29 +801,7 @@ LIMIT 5;`,
       
       <aside className={styles.sidebar}>
         <div className={styles.logo}
-          onClick={(e) => {
-            e.preventDefault();
-            // Reset to resting state (after intro)
-            setChatActive(false);
-            setMessages([]);
-            setInputText('');
-            setResponseState('idle');
-            setStreamedHeader('');
-            setStreamedText('');
-            setStreamingCode(false);
-            setStreamedCode('');
-            setCodeComplete(false);
-            // Make sure intro animation is complete
-            setIntroState({
-              started: true,
-              animate: true,
-              removeMask: true
-            });
-            setSetupState({
-              started: true,
-              animate: true
-            });
-          }}
+          onClick={resetToHome}
           style={{ cursor: 'pointer' }}
         >
           <Image 
@@ -561,29 +817,7 @@ LIMIT 5;`,
           <a 
             href="#" 
             className={styles.navItem}
-            onClick={(e) => {
-              e.preventDefault();
-              // Reset to resting state (after intro)
-              setChatActive(false);
-              setMessages([]);
-              setInputText('');
-              setResponseState('idle');
-              setStreamedHeader('');
-              setStreamedText('');
-              setStreamingCode(false);
-              setStreamedCode('');
-              setCodeComplete(false);
-              // Make sure intro animation is complete
-              setIntroState({
-                started: true,
-                animate: true,
-                removeMask: true
-              });
-              setSetupState({
-                started: true,
-                animate: true
-              });
-            }}
+            onClick={resetToHome}
           >
             <Image 
               src="/assets/intelligence/chats.svg"
@@ -698,7 +932,11 @@ LIMIT 5;`,
                   </div>
                 )}
                 
-                <button className={styles.sendButton} onClick={handleSubmit}>
+                <button 
+                  className={styles.sendButton} 
+                  onClick={handleSubmit}
+                  disabled={responseState === 'searching' || responseState === 'streaming' || streamingCode}
+                >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M11.3466 6.57854L11.3466 21L13.267 21L13.267 6.58127L12.3068 5.61967L11.3466 6.57854Z" fill="currentColor"/>
                     <path d="M11.3466 4.87535L13.267 4.87535L13.267 6.58127L18.2955 11.614L19.6136 10.3072L13.0139 3.70746C12.6234 3.31694 11.9902 3.31694 11.5997 3.70746L5 10.3072L6.30682 11.614L11.3466 6.57854L11.3466 4.87535Z" fill="currentColor"/>
@@ -745,7 +983,11 @@ LIMIT 5;`,
                   </button>
                   */}
                 </div>
-                <button className={styles.sendButton} onClick={handleSubmit}>
+                <button 
+                  className={styles.sendButton} 
+                  onClick={handleSubmit}
+                  disabled={responseState === 'searching' || responseState === 'streaming' || streamingCode}
+                >
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M11.3466 6.57854L11.3466 21L13.267 21L13.267 6.58127L12.3068 5.61967L11.3466 6.57854Z" fill="currentColor"/>
                     <path d="M11.3466 4.87535L13.267 4.87535L13.267 6.58127L18.2955 11.614L19.6136 10.3072L13.0139 3.70746C12.6234 3.31694 11.9902 3.31694 11.5997 3.70746L5 10.3072L6.30682 11.614L11.3466 6.57854L11.3466 4.87535Z" fill="currentColor"/>
@@ -807,55 +1049,7 @@ LIMIT 5;`,
           <div className={styles.chatContainer}>
             {/* Display all previous messages in the conversation */}
             {messages.map((message, index) => (
-              <div key={index} className={`${message.type === 'user' ? styles.userMessage : (message.type === 'code' ? styles.codeMessage : '')}`}>
-                {message.type === 'user' && (
-                  <div className={`${styles.message} ${
-                    message.id === lastMessageId ? 
-                    `${styles.userMessageHighlighted} ${responseState === 'searching' ? styles.searching : ''}` : ''
-                  }`}>
-                    {message.text}
-                  </div>
-                )}
-                
-                {message.type === 'ai' && (
-                  <div className={styles.aiResponse}>
-                    <div className={styles.responseIcon}>
-                      <AnimatedAvatar
-                        width={24}
-                        height={24}
-                        className={styles.avatar}
-                        isPlaying={false}
-                        isOutput={true}
-                      />
-                    </div>
-                    <div className={styles.responseContent}>
-                      <div className={styles.responseHeader}>{message.text.split('\n\n')[0]}</div>
-                      <div className={styles.responseText}>{message.text.split('\n\n')[1]}</div>
-                    </div>
-                  </div>
-                )}
-                
-                {message.type === 'code' && (
-                  <div className={styles.codeBlock}>
-                    <div className={styles.codeHeader}>
-                      <span>sql</span>
-                      <div className={styles.codeActions}>
-                        <button className={styles.codeAction}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 4V20M4 12H20" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/>
-                          </svg>
-                        </button>
-                        <button className={styles.codeAction}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 12H20M12 4L20 12L12 20" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    <pre className={styles.code}>{message.text}</pre>
-                  </div>
-                )}
-              </div>
+              <MessageItem key={index} message={message} lastMessageId={lastMessageId} responseState={responseState} />
             ))}
             
             {/* Show active response element (loading, streaming or code) */}
@@ -864,51 +1058,21 @@ LIMIT 5;`,
               <>
                 {/* Show searching or streaming response - these are mutually exclusive states */}
                 {(responseState === 'searching' || responseState === 'streaming') && (
-                  <div className={styles.aiResponse}>
-                    <div className={styles.responseIcon}>
-                      <AnimatedAvatar
-                        width={24}
-                        height={24}
-                        className={styles.avatar}
-                        isPlaying={responseState === 'searching'}
-                        isStopping={avatarComplete}
-                        onComplete={() => {
-                          console.log('Avatar animation completed');
-                        }}
-                      />
-                    </div>
-                    <div className={styles.responseContent}>
-                      <div className={styles.responseHeader}>
-                        {responseState === 'searching' && (
-                          <span className={styles.shimmerText}>Searching data sources<span className={styles.ellipsis}></span></span>
-                        )}
-                        {responseState === 'streaming' && streamedHeader}
-                      </div>
-                      {responseState === 'streaming' && <div className={styles.responseText}>{streamedText}</div>}
-                    </div>
-                  </div>
+                  <ActiveResponse 
+                    responseState={responseState} 
+                    streamedHeader={streamedHeader} 
+                    streamedText={streamedText} 
+                    avatarComplete={avatarComplete}
+                  />
                 )}
                 
                 {/* Show actively streaming code */}
                 {streamingCode && (
-                  <div className={styles.codeBlock}>
-                    <div className={styles.codeHeader}>
-                      <span>sql</span>
-                      <div className={styles.codeActions}>
-                        <button className={styles.codeAction}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 4V20M4 12H20" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/>
-                          </svg>
-                        </button>
-                        <button className={styles.codeAction}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 12H20M12 4L20 12L12 20" stroke="#666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    <pre className={styles.code}>{streamedCode}</pre>
-                  </div>
+                  <StreamingCode 
+                    streamingCode={streamingCode} 
+                    streamedCode={streamedCode} 
+                    codeComplete={codeComplete}
+                  />
                 )}
               </>
             )}
