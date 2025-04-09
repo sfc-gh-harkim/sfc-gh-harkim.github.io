@@ -548,6 +548,9 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   font-family: 'Inter', sans-serif;
+  will-change: scroll-position;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
 }
 
 .chatContainer::after {
@@ -693,7 +696,15 @@
   gap: 8px;
   max-width: calc(100% - 48px);
   width: auto;
+  transition: min-height 0.8s ease-out;
 }
+
+/*
+Add minimum height only during streaming phase
+.chatContainer[data-streaming="true"] .responseContent:nth-last-child(1) {
+  min-height: 160px;
+}
+*/
 
 .responseHeader {
   font-weight: 600;

@@ -30,25 +30,15 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
   const [hasCompleted, setHasCompleted] = useState(false);
   const [isInitialRender, setIsInitialRender] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const batchSize = useRef(5); // Number of items to process per batch
   const contentRef = useRef(content);
   
-  // Function to scroll chat container to bottom during streaming
+  // Optimized scroll function - more aggressive and immediate
   const scrollDuringStream = useCallback(() => {
-    requestAnimationFrame(() => {
-      const chatContainer = document.querySelector(`.${styles.chatContainer}`);
-      if (chatContainer) {
-        // Check if user is near the bottom before auto-scrolling
-        const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
-        
-        if (isNearBottom) {
-          chatContainer.scrollTo({
-            top: chatContainer.scrollHeight,
-            behavior: 'smooth'
-          });
-        }
-      }
-    });
+    const chatContainer = document.querySelector(`.${styles.chatContainer}`);
+    if (chatContainer) {
+      // Force an immediate scroll regardless of position
+      chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
+    }
   }, []);
   
   // Track if content has changed
@@ -76,20 +66,25 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
       setRenderedItems(itemsList);
       setCurrentIndex(itemsList.length);
       
-      // Apply a delay before setting hasCompleted to allow for smooth transition
+      // Immediately scroll when complete
+      scrollDuringStream();
+      
+      // Apply a shorter delay before setting hasCompleted
       setTimeout(() => {
         setHasCompleted(true);
         onComplete?.();
-      }, 100);
+        // Extra scroll to ensure visibility after complete
+        scrollDuringStream();
+      }, 50);
     } else if (isInitialRender) {
       // Only reset on initial render of a new content
       setRenderedItems([]);
       setCurrentIndex(0);
       setIsInitialRender(false);
     }
-  }, [content, isComplete, onComplete, contentType, isInitialRender]);
+  }, [content, isComplete, onComplete, contentType, isInitialRender, scrollDuringStream]);
   
-  // Handle streaming effect with improved chunking
+  // Handle streaming effect with single item processing
   useEffect(() => {
     // If already completed streaming this exact content, don't restart
     if (hasCompleted) return;
@@ -102,47 +97,43 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
       // Only mark as completed if we've reached the end of the content
       if (currentIndex >= items.length && items.length > 0) {
         setHasCompleted(true);
+        scrollDuringStream(); // Final scroll at completion
         onComplete?.();
+        console.log('Streaming completed in GenericStreamer');
       }
       return;
     }
     
-    // Process words in small batches to ensure smooth streaming
-    const processBatch = () => {
-      const endIndex = Math.min(currentIndex + batchSize.current, items.length);
-      const batch = items.slice(currentIndex, endIndex);
+    // Process one item at a time for a more natural typing effect
+    const currentItem = items[currentIndex];
+    
+    // Use more realistic typing speeds based on content type
+    let itemSpeed = speed;
+    
+    // For code, use different speeds for different line types
+    if (contentType === 'code') {
+      // Faster for empty lines, slower for complex lines
+      itemSpeed = currentItem.trim() === '' ? speed * 0.5 : 
+                 currentItem.length > 50 ? speed * 1.2 : 
+                 speed;
+    }
+    
+    timeoutRef.current = setTimeout(() => {
+      // Add the next item to the rendered items
+      setRenderedItems(prev => [...prev, items[currentIndex]]);
+      setCurrentIndex(prev => prev + 1);
       
-      setRenderedItems(prev => [...prev, ...batch]);
-      setCurrentIndex(endIndex);
-      
-      // Scroll down after each batch is rendered
+      // Immediately scroll after each item is rendered
       scrollDuringStream();
       
-      // Adjust batch size based on content length for optimal streaming
-      if (items.length > 100) {
-        const progress = currentIndex / items.length;
-        // Start small, gradually increase, then decrease again near the end
-        if (progress < 0.2) {
-          batchSize.current = Math.max(1, Math.floor(items.length / 200));
-        } else if (progress > 0.8) {
-          batchSize.current = Math.max(1, Math.floor(items.length / 200));
-        } else {
-          batchSize.current = Math.max(2, Math.floor(items.length / 100));
-        }
-      }
-    };
-    
-    timeoutRef.current = setTimeout(processBatch, 
-      // Vary the speed slightly to make the animation feel more natural
-      speed * (0.8 + Math.random() * 0.4)
-    );
+    }, itemSpeed * (0.8 + Math.random() * 0.4)); // Vary the speed slightly for natural effect
     
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [currentIndex, items, speed, isStreaming, onComplete, hasCompleted, scrollDuringStream]);
+  }, [currentIndex, items, speed, isStreaming, onComplete, hasCompleted, scrollDuringStream, contentType]);
   
   // If we've already completed streaming, just render the entire content
   // But with a smooth opacity transition to avoid blinking
@@ -346,7 +337,10 @@ const ActiveResponse: React.FC<ActiveResponseProps> = ({
   if (responseState !== 'searching' && responseState !== 'streaming') return null;
   
   return (
-    <div className={styles.aiResponse} style={containerStyle}>
+    <div 
+      className={styles.aiResponse} 
+      style={containerStyle}
+    >
       <div className={styles.responseIcon}>
         <AnimatedAvatar
           width={24}
@@ -407,6 +401,7 @@ const StreamingCode: React.FC<StreamingCodeProps> = ({
   // Fade in the component when it first appears
   useEffect(() => {
     if (streamingCode) {
+      // Slight delay to ensure component is mounted first
       const timer = setTimeout(() => {
         setIsVisible(true);
       }, 10);
@@ -416,13 +411,14 @@ const StreamingCode: React.FC<StreamingCodeProps> = ({
     }
   }, [streamingCode]);
   
+  // If not streaming or no code, don't render
+  if (!streamingCode || !streamedCode) return null;
+  
   // Style for smooth fade transitions
   const containerStyle = {
     opacity: isVisible ? 1 : 0,
     transition: 'opacity 300ms ease-in-out',
   };
-  
-  if (!streamingCode) return null;
   
   return (
     <div className={styles.codeMessage} style={containerStyle}>
@@ -449,6 +445,9 @@ const StreamingCode: React.FC<StreamingCodeProps> = ({
             isComplete={codeComplete}
             speed={10}
             contentType="code"
+            onComplete={() => {
+              console.log('Code streaming completed in StreamingCode component');
+            }}
           />
         </pre>
       </div>
@@ -491,6 +490,12 @@ function IntelligenceContent() {
   const [streamedCode, setStreamedCode] = useState('');
   const [codeComplete, setCodeComplete] = useState(false);
   
+  // Add a new state to track the entire streaming process
+  const [isStreaming, setIsStreaming] = useState(false);
+  
+  // Track the current factoid index for sequential cycling
+  const [factoidIndex, setFactoidIndex] = useState(0);
+  
   // Unique key for animation resets
   const [bgAnimationKey, setBgAnimationKey] = useState(0);
   
@@ -525,24 +530,32 @@ function IntelligenceContent() {
   // Database factoids to display for subsequent submissions
   const databaseFactoids: Factoid[] = [
     {
-      header: "Most Popular Arcade Games",
-      text: "Tron leads our arcade popularity charts with 42% of total gameplay hours this month. Space Invaders ranks second at 18%, followed by Pac-Man (15%), Galaga (14%), and Donkey Kong (11%). Tron's light cycle mini-game is the most replayed segment across all arcade titles.",
-      code: `SELECT 
-  game_name, 
-  ROUND(play_hours / SUM(play_hours) OVER() * 100, 1) AS percentage
-FROM arcade_games
-ORDER BY play_hours DESC
-LIMIT 5;`,
-      results: `+---------------+------------+
-| game_name     | percentage |
-+---------------+------------+
-| Tron          | 42.0       |
-| Space Invaders| 18.0       |
-| Pac-Man       | 15.0       |
-| Galaga        | 14.0       |
-| Donkey Kong   | 11.0       |
-+---------------+------------+
-5 rows in set (0.03 sec)`
+      header: "Peak Sales Analysis",
+      text: "Weekends drive 68% of our weekly revenue, with Saturday 2-5pm being our highest-grossing period (22% of total sales). December remains our most profitable month, with a 37% increase over the annual average. Summer promotions boosted weekday evening traffic by 42%, particularly on Thursdays.",
+      code: `-- Analyze sales by day and hour
+SELECT 
+  DAYNAME(transaction_time) AS day_of_week,
+  HOUR(transaction_time) AS hour_of_day,
+  COUNT(*) AS transaction_count,
+  SUM(amount) AS total_sales,
+  ROUND(SUM(amount) / (SELECT SUM(amount) FROM sales) * 100, 1) AS percentage
+FROM sales
+GROUP BY day_of_week, hour_of_day
+ORDER BY total_sales DESC
+LIMIT 8;`,
+      results: `+------------+------------+------------------+------------+------------+
+| day_of_week | hour_of_day | transaction_count | total_sales | percentage |
++------------+------------+------------------+------------+------------+
+| Saturday    | 14         | 3842             | 42680.50   | 12.4       |
+| Saturday    | 15         | 3614             | 39750.25   | 11.5       |
+| Saturday    | 16         | 3421             | 37215.75   | 10.8       |
+| Sunday      | 13         | 3290             | 33426.00   | 9.7        |
+| Sunday      | 14         | 3187             | 31987.25   | 9.3        |
+| Friday      | 17         | 3015             | 29845.50   | 8.7        |
+| Saturday    | 13         | 2876             | 28942.00   | 8.4        |
+| Thursday    | 18         | 2541             | 26315.80   | 7.6        |
++------------+------------+------------------+------------+------------+
+8 rows in set (0.07 sec)`
     },
     {
       header: "Player Points Leaderboard",
@@ -633,101 +646,72 @@ ORDER BY month;`
   ];
   
   const mockResponse = {
-    header: "Most Popular Arcade Games",
-    text: "Tron leads our arcade popularity charts with 42% of total gameplay hours this month. Space Invaders ranks second at 18%, followed by Pac-Man (15%), Galaga (14%), and Donkey Kong (11%). Tron's light cycle mini-game is the most replayed segment across all arcade titles.",
-    code: `SELECT 
-  game_name, 
-  ROUND(play_hours / SUM(play_hours) OVER() * 100, 1) AS percentage
-FROM arcade_games
-ORDER BY play_hours DESC
-LIMIT 5;`,
-    results: `+---------------+------------+
-| game_name     | percentage |
-+---------------+------------+
-| Tron          | 42.0       |
-| Space Invaders| 18.0       |
-| Pac-Man       | 15.0       |
-| Galaga        | 14.0       |
-| Donkey Kong   | 11.0       |
-+---------------+------------+
-5 rows in set (0.03 sec)`
+    header: "Peak Sales Analysis",
+    text: "Weekends drive 68% of our weekly revenue, with Saturday 2-5pm being our highest-grossing period (22% of total sales). December remains our most profitable month, with a 37% increase over the annual average. Summer promotions boosted weekday evening traffic by 42%, particularly on Thursdays.",
+    code: `-- Analyze sales by day and hour
+SELECT 
+  DAYNAME(transaction_time) AS day_of_week,
+  HOUR(transaction_time) AS hour_of_day,
+  COUNT(*) AS transaction_count,
+  SUM(amount) AS total_sales,
+  ROUND(SUM(amount) / (SELECT SUM(amount) FROM sales) * 100, 1) AS percentage
+FROM sales
+GROUP BY day_of_week, hour_of_day
+ORDER BY total_sales DESC
+LIMIT 8;`,
+    results: `+------------+------------+------------------+------------+------------+
+| day_of_week | hour_of_day | transaction_count | total_sales | percentage |
++------------+------------+------------------+------------+------------+
+| Saturday    | 14         | 3842             | 42680.50   | 12.4       |
+| Saturday    | 15         | 3614             | 39750.25   | 11.5       |
+| Saturday    | 16         | 3421             | 37215.75   | 10.8       |
+| Sunday      | 13         | 3290             | 33426.00   | 9.7        |
+| Sunday      | 14         | 3187             | 31987.25   | 9.3        |
+| Friday      | 17         | 3015             | 29845.50   | 8.7        |
+| Saturday    | 13         | 2876             | 28942.00   | 8.4        |
+| Thursday    | 18         | 2541             | 26315.80   | 7.6        |
++------------+------------+------------------+------------+------------+
+8 rows in set (0.07 sec)`
   };
 
-  // Improve the scrollToBottom function to be less aggressive and prevent layout thrashing
+  // Regular scroll to bottom function (instant)
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
       const chatContainer = document.querySelector(`.${styles.chatContainer}`);
       if (chatContainer) {
-        chatContainer.scrollTo({
-          top: chatContainer.scrollHeight,
-          behavior: 'smooth'
-        });
+        chatContainer.scrollTop = chatContainer.scrollHeight + 1000;
       }
     });
   }, []);
-
-  // Function to check if user is near bottom and should auto-scroll
-  const shouldAutoScroll = useCallback(() => {
-    const chatContainer = document.querySelector(`.${styles.chatContainer}`);
-    if (chatContainer) {
-      return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 150;
-    }
-    return true;
-  }, []);
-
-  const streamCode = (codeToStream: string, resultsToStream?: string) => {
-    // Set the code to be streamed
-    setStreamedCode(codeToStream);
-    
-    // Calculate estimated timing for animation
-    const lineCount = codeToStream.split('\n').length;
-    const codeAnimationTime = lineCount * 10 + 500; // Animation time plus buffer
-    
-    // Set up an interval to scroll down during code streaming
-    const scrollingInterval = setInterval(() => {
-      if (shouldAutoScroll()) {
-        scrollToBottom();
-      }
-    }, 100);
-    
-    setTimeout(() => {
-      // If there are results, add them to the code
-      if (resultsToStream) {
-        setStreamedCode(`${codeToStream}\n\n${resultsToStream}`);
-        
-        // Wait for results animation to complete
-        const resultsLineCount = resultsToStream.split('\n').length;
-        const totalAnimationTime = resultsLineCount * 10 + 500;
-        
-        setTimeout(() => {
-          clearInterval(scrollingInterval);
-          completeCodeStream(codeToStream, resultsToStream);
-        }, totalAnimationTime);
-      } else {
-        // No results, just complete the code stream
-        clearInterval(scrollingInterval);
-        completeCodeStream(codeToStream);
-      }
-    }, codeAnimationTime);
-  };
   
-  // Helper function to finalize code streaming
-  const completeCodeStream = (code: string, results?: string) => {
-    const finalText = results ? `${code}\n\n${results}` : code;
+  const streamCode = (codeToStream: string, resultsToStream?: string) => {
+    // Combine the code and results
+    const finalText = resultsToStream 
+      ? `${codeToStream}\n\n${resultsToStream}`
+      : codeToStream;
     
-    // Update all states 
-    setStreamingCode(false);
-    setCodeComplete(true);
-    setAvatarComplete(true);
-    setResponseState('idle');
-    setStreamedHeader('');
-    setStreamedText('');
-    
-    // Add code to messages list
+    // Immediately add the code message to the list
     setMessages(prev => [...prev, { type: 'code', text: finalText }]);
     
-    // Scroll chat to bottom
-    scrollToBottom();
+    // Important: Enable the send button immediately
+    setIsStreaming(false);
+    setResponseState('idle');
+    
+    // Ensure everything is scrolled right away
+    requestAnimationFrame(() => {
+      // Force scroll with extra padding
+      const chatContainer = document.querySelector(`.${styles.chatContainer}`);
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight + 2000;
+      }
+      
+      // Clean up other states
+      setStreamingCode(false);
+      setCodeComplete(true);
+      setAvatarComplete(true);
+      setStreamedHeader('');
+      setStreamedText('');
+    });
   };
 
   const handleSubmit = () => {
@@ -740,83 +724,104 @@ LIMIT 5;`,
     setLastMessageId(newMessageId);
     setInputText('');
     
-    // Activate chat mode if not already active
-    if (!chatActive) {
-      setChatActive(true);
-      document.querySelector(`.${styles.container}`)?.classList.add(styles.chatActiveContainer);
-    }
-    
-    // Reset streaming states and start searching state
-    setResponseState('searching');
-    setStreamedHeader('');
-    setStreamedText('');
+    // Reset all streaming states
     setStreamingCode(false);
     setCodeComplete(false);
-    setAvatarComplete(false);
+    setStreamedCode('');
     
-    // Reset animation key to force re-animation
-    setBgAnimationKey(prev => prev + 1);
-    
-    // Select appropriate response
-    const responseToUse = chatActive 
-      ? databaseFactoids[Math.floor(Math.random() * databaseFactoids.length)]
-      : mockResponse;
-    
-    // Set up auto-scrolling for the streaming response
-    const scrollingInterval = setInterval(() => {
-      if (shouldAutoScroll()) {
-        scrollToBottom();
-      }
-    }, 100);
-    
-    // Show "Searching data sources..." for 3 seconds before streaming response
-    setTimeout(() => {
-      // Start streaming response
-      setResponseState('streaming');
-      setStreamedHeader(responseToUse.header);
-      setLastMessageId(null); // Clear highlighting
+    // Scroll to bottom immediately after adding the user message
+    requestAnimationFrame(() => {
+      scrollToBottom();
       
-      // Start body text after a delay
+      // Activate chat mode if not already active
+      if (!chatActive) {
+        setChatActive(true);
+        document.querySelector(`.${styles.container}`)?.classList.add(styles.chatActiveContainer);
+      }
+      
+      // Reset streaming states and start searching state
+      setResponseState('searching');
+      setStreamedHeader('');
+      setStreamedText('');
+      setAvatarComplete(false);
+      
+      // Reset animation key to force re-animation
+      setBgAnimationKey(prev => prev + 1);
+      
+      // Select the next factoid in sequence
+      const responseToUse = chatActive 
+        ? databaseFactoids[factoidIndex]
+        : mockResponse;
+      
+      // Update the factoid index for next time (wrap around to beginning when we reach the end)
+      setFactoidIndex((current) => (current + 1) % databaseFactoids.length);
+      
+      // Set up consistent auto-scrolling for the searching state
+      const searchingScrollInterval = setInterval(() => {
+        scrollToBottom();
+      }, 100);
+      
+      // Show "Searching data sources..." for 3 seconds before streaming response
       setTimeout(() => {
-        setStreamedText(responseToUse.text);
-        const wordCount = responseToUse.text.split(/\s+/).length;
-        const estimatedTime = Math.max(2000, wordCount * 15); // Ensure minimum time and increase time per word
+        clearInterval(searchingScrollInterval);
         
-        // Wait for text completion, then add to message history
+        // Start streaming response
+        setResponseState('streaming');
+        setStreamedHeader(responseToUse.header);
+        setLastMessageId(null); // Clear highlighting
+        
+        // Set streaming to true only when we actually start streaming content
+        setIsStreaming(true);
+        
+        // Start consistent scrolling during header streaming
+        const headerScrollInterval = setInterval(scrollToBottom, 100);
+        
+        // Start body text after a delay
         setTimeout(() => {
-          // Add AI response to messages BEFORE changing the streaming state
-          setMessages(prev => [
-            ...prev, 
-            { 
-              type: 'ai', 
-              text: `${responseToUse.header}\n\n${responseToUse.text}` 
-            }
-          ]);
+          clearInterval(headerScrollInterval);
           
-          // Small delay before stopping the streaming animation
-          // This prevents the blinking effect by ensuring the permanent message is rendered first
+          setStreamedText(responseToUse.text);
+          const wordCount = responseToUse.text.split(/\s+/).length;
+          const estimatedTime = Math.max(2000, wordCount * 15); // Ensure minimum time and increase time per word
+          
+          // Start consistent scrolling during text streaming
+          const textScrollInterval = setInterval(scrollToBottom, 100);
+          
+          // Wait for text completion, then add to message history
           setTimeout(() => {
-            clearInterval(scrollingInterval); // Stop continuous scrolling
-            setResponseState('complete');
-            setAvatarComplete(true);
+            clearInterval(textScrollInterval);
             
-            // Small delay before starting code streaming to prevent browser layout thrashing
-            setTimeout(() => {
-              // Start code streaming
-              setStreamingCode(true);
-              if ('results' in responseToUse) {
-                streamCode(responseToUse.code, responseToUse.results as string);
-              } else {
-                streamCode(responseToUse.code);
+            // Add AI response to messages
+            setMessages(prev => [
+              ...prev, 
+              { 
+                type: 'ai', 
+                text: `${responseToUse.header}\n\n${responseToUse.text}` 
               }
+            ]);
+            
+            // Force scroll after adding the message
+            requestAnimationFrame(() => {
+              scrollToBottom();
               
-              // Scroll to bottom after a small delay to ensure proper rendering
-              setTimeout(scrollToBottom, 100);
-            }, 300);
-          }, 100);
-        }, estimatedTime);
-      }, 1000);
-    }, 3000);
+              // Mark response as complete and avatar animation complete
+              setResponseState('complete');
+              setAvatarComplete(true);
+              
+              // Small delay before starting code streaming to prevent browser layout thrashing
+              setTimeout(() => {
+                // Start code streaming with proper content
+                if ('results' in responseToUse) {
+                  streamCode(responseToUse.code, responseToUse.results as string);
+                } else {
+                  streamCode(responseToUse.code);
+                }
+              }, 300);
+            });
+          }, estimatedTime);
+        }, 1000);
+      }, 3000);
+    });
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -845,6 +850,10 @@ LIMIT 5;`,
     setStreamingCode(false);
     setStreamedCode('');
     setCodeComplete(false);
+    setIsStreaming(false);
+    
+    // Reset the factoid index to start from the beginning again
+    setFactoidIndex(0);
     
     // Make sure intro animation is complete
     setIntroState({
@@ -1207,7 +1216,10 @@ LIMIT 5;`,
         
         {/* Chat Messages */}
         {chatActive && (
-          <div className={styles.chatContainer}>
+          <div 
+            className={styles.chatContainer}
+            data-streaming={isStreaming ? 'true' : 'false'}
+          >
             {/* Display all previous messages in the conversation */}
             {messages.map((message, index) => (
               <MessageItem key={index} message={message} lastMessageId={lastMessageId} responseState={responseState} />
