@@ -609,16 +609,25 @@
   color: var(--intelligence-text-primary);
   border-radius: 8px;
   position: relative;
+  transition-delay: 1s;
 }
 
+/* Base styles for the highlighted message - always applied */
 .userMessageHighlighted {
   position: relative;
-  box-shadow: -4px -4px 32px 0px rgba(16, 159, 212, 0.12) inset, 4px 4px 32px 0px rgba(13, 141, 150, 0.12) inset;
   border: none;
-  transition: background 1.5s cubic-bezier(0.3, 0.0, 0.7, 1.0), 
-              box-shadow 1.5s cubic-bezier(0.3, 0.0, 0.7, 1.0);
+  box-shadow: none;
+  transition: all 1s ease-out;
 }
 
+/* Styles applied only when in searching state */
+.userMessageHighlighted.searching {
+  box-shadow: -4px -4px 32px 0px rgba(16, 159, 212, 0.12) inset, 4px 4px 32px 0px rgba(13, 141, 150, 0.12) inset;
+  background-color: var(--intelligence-background-primary);
+  transition: box-shadow 1s ease-in-out;
+}
+
+/* Border gradient element - hidden by default */
 .userMessageHighlighted::before {
   content: "";
   position: absolute;
@@ -631,25 +640,13 @@
   background-size: 400% 100%;
   z-index: -1;
   animation: shimmerBorder 3s linear infinite;
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
+
+/* Show the border only when in searching state */
+.userMessageHighlighted.searching::before {
   opacity: 1;
-  transition: opacity 1.5s cubic-bezier(0.3, 0.0, 0.7, 1.0);
-}
-
-.userMessageHighlighted.message {
-  background-color: var(--intelligence-background-primary);
-}
-
-.userMessage.userMessageHighlighted:not(.searching)::before {
-  opacity: 0;
-}
-
-.userMessageHighlighted:not(.searching) {
-  background: var(--intelligence-input-bg);
-  box-shadow: none;
-}
-
-.userMessageHighlighted:not(.searching)::before {
-  opacity: 0;
 }
 
 .aiMessage {
@@ -1097,4 +1094,4 @@ Add minimum height only during streaming phase
     font-size: 30px;
     line-height: 36px;
   }
-}
+} 

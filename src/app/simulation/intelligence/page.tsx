@@ -205,6 +205,14 @@ interface MessageItemProps {
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, lastMessageId, responseState }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [wasHighlighted, setWasHighlighted] = useState(false);
+  
+  // Track if this message was ever highlighted so we can apply transition effects
+  useEffect(() => {
+    if (message.id === lastMessageId) {
+      setWasHighlighted(true);
+    }
+  }, [message.id, lastMessageId]);
   
   // Add smooth fade-in effect when message is rendered
   useEffect(() => {
@@ -220,12 +228,19 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, lastMessageId, respo
   };
   
   if (message.type === 'user') {
+    // Determine classes for the message
+    const isCurrentlyHighlighted = message.id === lastMessageId;
+    const messageClasses = [
+      styles.message,
+      // Keep the base highlight class if it was ever highlighted (for transitions)
+      wasHighlighted ? styles.userMessageHighlighted : '',
+      // Add the active searching class only when currently highlighted and in searching state
+      isCurrentlyHighlighted && responseState === 'searching' ? styles.searching : ''
+    ].filter(Boolean).join(' ');
+    
     return (
       <div className={styles.userMessage} style={messageStyle}>
-        <div className={`${styles.message} ${
-          message.id === lastMessageId ? 
-          `${styles.userMessageHighlighted} ${responseState === 'searching' ? styles.searching : ''}` : ''
-        }`}>
+        <div className={messageClasses}>
           {message.text}
         </div>
       </div>
