@@ -27,8 +27,38 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
   const [renderedItems, setRenderedItems] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [items, setItems] = useState<string[]>([]);
+  const [hasCompleted, setHasCompleted] = useState(false);
+  const [isInitialRender, setIsInitialRender] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const batchSize = useRef(5); // Number of items to process per batch
+  const contentRef = useRef(content);
+  
+  // Function to scroll chat container to bottom during streaming
+  const scrollDuringStream = useCallback(() => {
+    requestAnimationFrame(() => {
+      const chatContainer = document.querySelector(`.${styles.chatContainer}`);
+      if (chatContainer) {
+        // Check if user is near the bottom before auto-scrolling
+        const isNearBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
+        
+        if (isNearBottom) {
+          chatContainer.scrollTo({
+            top: chatContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    });
+  }, []);
+  
+  // Track if content has changed
+  useEffect(() => {
+    if (content !== contentRef.current) {
+      contentRef.current = content;
+      setHasCompleted(false);
+      setIsInitialRender(true);
+    }
+  }, [content]);
   
   // Split content into words or lines when it changes
   useEffect(() => {
@@ -45,21 +75,34 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
     if (isComplete) {
       setRenderedItems(itemsList);
       setCurrentIndex(itemsList.length);
-      onComplete?.();
-    } else {
+      
+      // Apply a delay before setting hasCompleted to allow for smooth transition
+      setTimeout(() => {
+        setHasCompleted(true);
+        onComplete?.();
+      }, 100);
+    } else if (isInitialRender) {
+      // Only reset on initial render of a new content
       setRenderedItems([]);
       setCurrentIndex(0);
+      setIsInitialRender(false);
     }
-  }, [content, isComplete, onComplete, contentType]);
+  }, [content, isComplete, onComplete, contentType, isInitialRender]);
   
   // Handle streaming effect with improved chunking
   useEffect(() => {
-    if (!isStreaming || currentIndex >= items.length || isComplete) {
+    // If already completed streaming this exact content, don't restart
+    if (hasCompleted) return;
+    
+    if (!isStreaming || currentIndex >= items.length) {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      if (currentIndex >= items.length && onComplete) {
-        onComplete();
+      
+      // Only mark as completed if we've reached the end of the content
+      if (currentIndex >= items.length && items.length > 0) {
+        setHasCompleted(true);
+        onComplete?.();
       }
       return;
     }
@@ -72,10 +115,20 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
       setRenderedItems(prev => [...prev, ...batch]);
       setCurrentIndex(endIndex);
       
-      // Adjust batch size based on content length to ensure consistent streaming experience
-      if (items.length > 100 && currentIndex > items.length / 3) {
-        // Maintain a more consistent streaming rate for longer content
-        batchSize.current = Math.max(1, Math.floor(items.length / 100));
+      // Scroll down after each batch is rendered
+      scrollDuringStream();
+      
+      // Adjust batch size based on content length for optimal streaming
+      if (items.length > 100) {
+        const progress = currentIndex / items.length;
+        // Start small, gradually increase, then decrease again near the end
+        if (progress < 0.2) {
+          batchSize.current = Math.max(1, Math.floor(items.length / 200));
+        } else if (progress > 0.8) {
+          batchSize.current = Math.max(1, Math.floor(items.length / 200));
+        } else {
+          batchSize.current = Math.max(2, Math.floor(items.length / 100));
+        }
       }
     };
     
@@ -89,11 +142,31 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [currentIndex, items, speed, isStreaming, isComplete, onComplete]);
+  }, [currentIndex, items, speed, isStreaming, onComplete, hasCompleted, scrollDuringStream]);
+  
+  // If we've already completed streaming, just render the entire content
+  // But with a smooth opacity transition to avoid blinking
+  const containerStyle = {
+    transition: 'opacity 0.3s ease-in',
+    opacity: 1
+  };
+  
+  if (hasCompleted && !isInitialRender) {
+    if (contentType === 'text') {
+      return <div className={styles.streamedTextContainer} style={containerStyle}>{content}</div>;
+    }
+    return (
+      <div className={styles.streamedCodeContainer} style={containerStyle}>
+        {items.map((line, index) => (
+          <div key={index}>{line}</div>
+        ))}
+      </div>
+    );
+  }
   
   if (contentType === 'text') {
     return (
-      <div className={styles.streamedTextContainer}>
+      <div className={styles.streamedTextContainer} style={containerStyle}>
         {renderedItems.map((word, index) => (
           <span 
             key={index} 
@@ -101,7 +174,7 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
             style={{
               display: /^\s+$/.test(word) ? 'inline' : 'inline-block',
               color: 'inherit',
-              animationDelay: `${index * 10}ms` // Stagger the fade-in animation slightly
+              animationDelay: `${Math.min(index * 5, 50)}ms` // Cap the delay for better performance
             }}
           >
             {word}
@@ -118,7 +191,7 @@ const GenericStreamer: React.FC<GenericStreamerProps> = ({
           key={index} 
           className={styles.streamedLine}
           style={{
-            animationDelay: `${Math.min(index * 5, 200)}ms` // Cap the delay for very long code
+            animationDelay: `${Math.min(index * 3, 100)}ms` // Cap the delay for very long code
           }}
         >
           {line}
@@ -140,9 +213,24 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, lastMessageId, responseState }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Add smooth fade-in effect when message is rendered
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 10);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  const messageStyle = {
+    opacity: isVisible ? 1 : 0,
+    transition: 'opacity 150ms ease-in'
+  };
+  
   if (message.type === 'user') {
     return (
-      <div className={styles.userMessage}>
+      <div className={styles.userMessage} style={messageStyle}>
         <div className={`${styles.message} ${
           message.id === lastMessageId ? 
           `${styles.userMessageHighlighted} ${responseState === 'searching' ? styles.searching : ''}` : ''
@@ -155,7 +243,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, lastMessageId, respo
 
   if (message.type === 'ai') {
     return (
-      <div className={styles.aiResponse}>
+      <div className={styles.aiResponse} style={messageStyle}>
         <div className={styles.responseIcon}>
           <AnimatedAvatar
             width={24}
@@ -191,7 +279,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, lastMessageId, respo
 
   if (message.type === 'code') {
     return (
-      <div className={styles.codeMessage}>
+      <div className={styles.codeMessage} style={messageStyle}>
         <div className={styles.codeBlock}>
           <div className={styles.codeHeader}>
             <span>sql</span>
@@ -239,10 +327,26 @@ const ActiveResponse: React.FC<ActiveResponseProps> = ({
   streamedText, 
   avatarComplete 
 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Fade in the component when it first appears
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 10);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Style for smooth fade transitions
+  const containerStyle = {
+    opacity: isVisible ? 1 : 0,
+    transition: 'opacity 300ms ease-in-out',
+  };
+  
   if (responseState !== 'searching' && responseState !== 'streaming') return null;
   
   return (
-    <div className={styles.aiResponse}>
+    <div className={styles.aiResponse} style={containerStyle}>
       <div className={styles.responseIcon}>
         <AnimatedAvatar
           width={24}
@@ -298,10 +402,30 @@ const StreamingCode: React.FC<StreamingCodeProps> = ({
   streamedCode, 
   codeComplete 
 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Fade in the component when it first appears
+  useEffect(() => {
+    if (streamingCode) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+    }
+  }, [streamingCode]);
+  
+  // Style for smooth fade transitions
+  const containerStyle = {
+    opacity: isVisible ? 1 : 0,
+    transition: 'opacity 300ms ease-in-out',
+  };
+  
   if (!streamingCode) return null;
   
   return (
-    <div className={styles.codeMessage}>
+    <div className={styles.codeMessage} style={containerStyle}>
       <div className={styles.codeBlock}>
         <div className={styles.codeHeader}>
           <span>sql</span>
@@ -529,13 +653,27 @@ LIMIT 5;`,
 5 rows in set (0.03 sec)`
   };
 
-  // Function to scroll chat container to bottom
-  const scrollToBottom = () => {
+  // Improve the scrollToBottom function to be less aggressive and prevent layout thrashing
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      const chatContainer = document.querySelector(`.${styles.chatContainer}`);
+      if (chatContainer) {
+        chatContainer.scrollTo({
+          top: chatContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    });
+  }, []);
+
+  // Function to check if user is near bottom and should auto-scroll
+  const shouldAutoScroll = useCallback(() => {
     const chatContainer = document.querySelector(`.${styles.chatContainer}`);
     if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+      return chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 150;
     }
-  };
+    return true;
+  }, []);
 
   const streamCode = (codeToStream: string, resultsToStream?: string) => {
     // Set the code to be streamed
@@ -544,6 +682,13 @@ LIMIT 5;`,
     // Calculate estimated timing for animation
     const lineCount = codeToStream.split('\n').length;
     const codeAnimationTime = lineCount * 10 + 500; // Animation time plus buffer
+    
+    // Set up an interval to scroll down during code streaming
+    const scrollingInterval = setInterval(() => {
+      if (shouldAutoScroll()) {
+        scrollToBottom();
+      }
+    }, 100);
     
     setTimeout(() => {
       // If there are results, add them to the code
@@ -554,9 +699,13 @@ LIMIT 5;`,
         const resultsLineCount = resultsToStream.split('\n').length;
         const totalAnimationTime = resultsLineCount * 10 + 500;
         
-        setTimeout(completeCodeStream, totalAnimationTime, codeToStream, resultsToStream);
+        setTimeout(() => {
+          clearInterval(scrollingInterval);
+          completeCodeStream(codeToStream, resultsToStream);
+        }, totalAnimationTime);
       } else {
         // No results, just complete the code stream
+        clearInterval(scrollingInterval);
         completeCodeStream(codeToStream);
       }
     }, codeAnimationTime);
@@ -613,6 +762,13 @@ LIMIT 5;`,
       ? databaseFactoids[Math.floor(Math.random() * databaseFactoids.length)]
       : mockResponse;
     
+    // Set up auto-scrolling for the streaming response
+    const scrollingInterval = setInterval(() => {
+      if (shouldAutoScroll()) {
+        scrollToBottom();
+      }
+    }, 100);
+    
     // Show "Searching data sources..." for 3 seconds before streaming response
     setTimeout(() => {
       // Start streaming response
@@ -620,22 +776,15 @@ LIMIT 5;`,
       setStreamedHeader(responseToUse.header);
       setLastMessageId(null); // Clear highlighting
       
-      // Scroll to ensure visibility
-      scrollToBottom();
-      
       // Start body text after a delay
       setTimeout(() => {
         setStreamedText(responseToUse.text);
-        // More accurate time estimation based on text length and batch size
         const wordCount = responseToUse.text.split(/\s+/).length;
-        const estimatedTime = Math.max(2000, wordCount * 10); // Ensure minimum time
+        const estimatedTime = Math.max(2000, wordCount * 15); // Ensure minimum time and increase time per word
         
         // Wait for text completion, then add to message history
         setTimeout(() => {
-          setResponseState('complete');
-          setAvatarComplete(true);
-          
-          // Add AI response to messages
+          // Add AI response to messages BEFORE changing the streaming state
           setMessages(prev => [
             ...prev, 
             { 
@@ -644,15 +793,27 @@ LIMIT 5;`,
             }
           ]);
           
-          // Start code streaming
-          setStreamingCode(true);
-          if ('results' in responseToUse) {
-            streamCode(responseToUse.code, responseToUse.results as string);
-          } else {
-            streamCode(responseToUse.code);
-          }
-          
-          scrollToBottom();
+          // Small delay before stopping the streaming animation
+          // This prevents the blinking effect by ensuring the permanent message is rendered first
+          setTimeout(() => {
+            clearInterval(scrollingInterval); // Stop continuous scrolling
+            setResponseState('complete');
+            setAvatarComplete(true);
+            
+            // Small delay before starting code streaming to prevent browser layout thrashing
+            setTimeout(() => {
+              // Start code streaming
+              setStreamingCode(true);
+              if ('results' in responseToUse) {
+                streamCode(responseToUse.code, responseToUse.results as string);
+              } else {
+                streamCode(responseToUse.code);
+              }
+              
+              // Scroll to bottom after a small delay to ensure proper rendering
+              setTimeout(scrollToBottom, 100);
+            }, 300);
+          }, 100);
         }, estimatedTime);
       }, 1000);
     }, 3000);
