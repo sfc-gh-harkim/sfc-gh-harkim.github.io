@@ -1,0 +1,411 @@
+.container {
+    width: 100%;
+}
+
+.inputContainer {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 1rem;
+    contain: layout style;
+}
+
+.statusTextContainer {
+    position: absolute;
+    top: 24px;
+    left: 26px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avatarContainer {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.statusText {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--balto-text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.statusText.resting {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--balto-text-secondary);
+    text-transform: none;
+}
+
+.generateButton {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--balto-text-secondary);
+    font-weight: 500;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    text-underline-offset: 2px;
+}
+
+.generateButton:hover {
+    color: var(--balto-text-primary);
+}
+
+/* Default state - initial text area */
+.styledInput {
+    overflow: hidden;
+    width: 100%;
+    padding: 24px;
+    padding-top: 52px;
+    font-size: 14px;
+    line-height: 20px;
+    border: 1px solid var(--balto-border-primary);
+    border-radius: 6px;
+    background: var(--balto-background-secondary);
+    transition: all 0.3s ease;
+    outline: none;
+    position: relative;
+    color: var(--balto-text-primary);
+    box-sizing: border-box;
+    height: 120px;
+    vertical-align: top;
+    font-family: inherit;
+}
+
+.styledInput::placeholder {
+    color: var(--balto-text-tertiary);
+}
+
+/* Thinking state - during animation */
+.styledInput.thinking {
+    position: relative;
+    border: 1px solid transparent;
+    background: var(--balto-background-secondary);
+    will-change: border, opacity;
+    animation: none;
+}
+
+/* Show gradient circles when in thinking state */
+.styledInput.thinking ~ .gradientCircleContainer {
+    opacity: 1;
+}
+
+.styledInput.thinking ~ .gradientCircleContainer .gradientCircle.primary {
+    animation: rotate-slow-primary 16s linear infinite;
+}
+
+.styledInput.thinking ~ .gradientCircleContainer .gradientCircle.secondary {
+    animation: rotate-slow-secondary 24s linear infinite;
+}
+
+/* Modify output state to work with gradient circles */
+.styledInput.output ~ .gradientCircleContainer {
+    opacity: 1;
+    animation: fade-out-circles 3s ease forwards 1s;
+}
+
+@keyframes fade-out-circles {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Output state - modified for gradient circles */
+.styledInput.output {
+    border: 1px solid transparent;
+    background: var(--balto-background-secondary);
+    transition: border 0.3s ease 3s;
+    box-shadow: none;
+    animation: restore-border 3s ease forwards 3s;
+}
+
+@keyframes restore-border {
+    0% {
+        border: 1px solid transparent;
+    }
+    100% {
+        border: 1px solid var(--balto-border-primary);
+    }
+}
+
+/* SVG outline container - optimized for performance */
+.thinkingOutline {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border-radius: 6px;
+    z-index: 1;
+    contain: layout paint style;
+}
+
+/* Animated gradient border for thinking state - optimized */
+.gradientPath {
+    fill: none;
+    stroke: url(#loading-gradient);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 92 1280;
+    stroke-dashoffset: 1360;
+    transition: none;
+    filter: drop-shadow(0 0 2px var(--balto-glow-primary));
+    opacity: 0.3;
+    will-change: stroke-dashoffset;
+    transform: translateZ(0);
+}
+
+/* Base border for thinking state */
+.basePath {
+    fill: none;
+    stroke: var(--balto-gradient-primary-start);
+    stroke-width: 4;
+    stroke-linecap: round;
+    opacity: 0.3;
+    will-change: opacity, stroke-width;
+}
+
+/* Completed gradient border for output state */
+.outlinePath {
+    fill: none;
+    stroke: url(#completed-gradient);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    transition: stroke-width 0.1s ease;
+    will-change: stroke-opacity, stroke-width;
+}
+
+/* Thinking state - show animated border */
+.thinkingOutline.thinking {
+    display: block;
+}
+
+.thinkingOutline.thinking .outlinePath {
+    display: none;
+}
+
+.thinkingOutline.thinking .basePath {
+    opacity: 1;
+    stroke-width: 6;
+    stroke: url(#completed-gradient);
+}
+
+.thinkingOutline.thinking .gradientPath {
+    stroke-width: 6;
+    animation: trace-outline 3s linear infinite;
+    opacity: 1;
+    transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Output state - show completed border */
+.thinkingOutline.output {
+    display: block;
+}
+
+.thinkingOutline.output .outlinePath {
+    stroke: url(#completed-gradient);
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    stroke-width: 6;
+    animation: fade-out-stroke 3s ease forwards;
+    transform: translateZ(0);
+}
+
+.thinkingOutline.output .basePath {
+    stroke-width: 6;
+    stroke: url(#completed-gradient);
+    opacity: 1;
+    animation: fade-out-stroke 3s ease forwards;
+}
+
+.thinkingOutline.output .gradientPath {
+    display: none;
+}
+
+@keyframes trace-outline {
+    0% {
+        stroke-dasharray: 92 1360;
+        stroke-dashoffset: 1360;
+    }
+    100% {
+        stroke-dasharray: 92 1360;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fade-out-stroke {
+    0% {
+        stroke-opacity: 1;
+        stroke-width: 6;
+    }
+    100% {
+        stroke-opacity: 0;
+        stroke-width: 1;
+    }
+}
+
+/* Optimized shimmer effect */
+.skeletonContainer {
+    position: absolute;
+    top: 60px;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    contain: layout paint style;
+}
+
+.skeletonLine {
+    height: 12px;
+    border-radius: 16px;
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.12) 20%,
+        rgba(0, 0, 0, 0.12) 35%,
+        rgba(0, 0, 0, 0.08) 50%,
+        rgba(0, 0, 0, 0.12) 65%,
+        rgba(0, 0, 0, 0.12) 80%,
+        rgba(0, 0, 0, 0.08) 100%
+    );
+    background-size: 200% 100%;
+    will-change: background-position;
+    transform: translateZ(0);
+}
+
+.skeletonLine:nth-child(1) {
+    width: 100%;
+}
+
+.skeletonLine:nth-child(2) {
+    width: 80%;
+}
+
+.shimmer {
+    animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 0% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}
+
+/* Add styles for the circular gradient containers */
+.gradientCircleContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.gradientCircle {
+    position: absolute;
+    border-radius: 50%;
+    transform-origin: center;
+    will-change: transform;
+    opacity: 0.7;
+    filter: blur(40px);
+    /* Use translate3d for better GPU acceleration */
+    transform: translate3d(0, 0, 0);
+}
+
+.gradientCircle.primary {
+    width: 280%;
+    height: 160%;
+    top: -30%;
+    left: -50%;
+    background: radial-gradient(
+        ellipse at center,
+        var(--balto-glow-primary) 0%,
+        var(--balto-glow-secondary) 50%,
+        transparent 70%
+    );
+}
+
+.gradientCircle.secondary {
+    width: 180%;
+    height: 240%;
+    bottom: -40%;
+    right: -30%;
+    background: radial-gradient(
+        ellipse at center,
+        var(--balto-glow-secondary) 0%,
+        var(--balto-glow-primary) 50%,
+        transparent 70%
+    );
+}
+
+/* Animation for rotations */
+@keyframes rotate-slow-primary {
+    0% {
+        transform: rotate(0deg) translate3d(0, 0, 0) scale(1);
+    }
+    25% {
+        transform: rotate(90deg) translate3d(5%, -5%, 0) scale(1.02);
+    }
+    50% {
+        transform: rotate(180deg) translate3d(0, -10%, 0) scale(1.05);
+    }
+    75% {
+        transform: rotate(270deg) translate3d(-5%, -5%, 0) scale(1.02);
+    }
+    100% {
+        transform: rotate(360deg) translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes rotate-slow-secondary {
+    0% {
+        transform: rotate(0deg) translate3d(0, 0, 0) scale(1);
+    }
+    25% {
+        transform: rotate(-90deg) translate3d(-5%, 5%, 0) scale(1.02);
+    }
+    50% {
+        transform: rotate(-180deg) translate3d(0, 10%, 0) scale(1.05);
+    }
+    75% {
+        transform: rotate(-270deg) translate3d(5%, 5%, 0) scale(1.02);
+    }
+    100% {
+        transform: rotate(-360deg) translate3d(0, 0, 0) scale(1);
+    }
+}
+
+/* Update thinking state to work with both SVG and gradient circles */
+.thinkingOutline {
+    z-index: 1;
+} 

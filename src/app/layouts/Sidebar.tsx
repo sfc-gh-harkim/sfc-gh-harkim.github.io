@@ -23,6 +23,7 @@ const sidebarItems: SidebarItem[] = [
     href: '/loading-states',
     children: [
       { title: 'AI Input Loader', href: '/loading-states/ai-input-loader' },
+      { title: 'AI Input Loader (Performant)', href: '/loading-states/ai-input-loader-performant' },
       { title: 'Multi AI Input Loader', href: '/loading-states/multi-ai-input-loader' },
     ],
   },
