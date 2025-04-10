@@ -1,3 +1,4 @@
+/* Base container styles */
 .container {
     width: 100%;
 }
@@ -14,6 +15,7 @@
     contain: layout style;
 }
 
+/* Status and text styles */
 .statusTextContainer {
     position: absolute;
     top: 24px;
@@ -43,7 +45,6 @@
 .statusText.resting {
     font-size: 14px;
     line-height: 20px;
-    color: var(--balto-text-secondary);
     text-transform: none;
 }
 
@@ -65,7 +66,7 @@
     color: var(--balto-text-primary);
 }
 
-/* Default state - initial text area */
+/* Textarea input styles */
 .styledInput {
     overflow: hidden;
     width: 100%;
@@ -90,62 +91,58 @@
     color: var(--balto-text-tertiary);
 }
 
-/* Thinking state - during animation */
-.styledInput.thinking {
-    position: relative;
-    border: 1px solid transparent;
-    background: var(--balto-background-secondary);
-    will-change: border, opacity;
-    animation: none;
+/* Gradient circle container and elements */
+.gradientCircleContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
 }
 
-/* Show gradient circles when in thinking state */
-.styledInput.thinking ~ .gradientCircleContainer {
-    opacity: 1;
+.gradientCircle {
+    position: absolute;
+    border-radius: 50%;
+    transform-origin: center;
+    will-change: transform;
+    opacity: 0.7;
+    filter: blur(40px);
+    transform: translate3d(0, 0, 0);
 }
 
-.styledInput.thinking ~ .gradientCircleContainer .gradientCircle.primary {
-    animation: rotate-slow-primary 16s linear infinite;
+.gradientCircle.primary {
+    width: 280%;
+    height: 160%;
+    top: -60%;
+    left: -80%;
+    background: radial-gradient(
+        ellipse at center,
+        var(--balto-glow-primary) 0%,
+        var(--balto-glow-secondary) 50%,
+        transparent 70%
+    );
 }
 
-.styledInput.thinking ~ .gradientCircleContainer .gradientCircle.secondary {
-    animation: rotate-slow-secondary 24s linear infinite;
+.gradientCircle.secondary {
+    width: 180%;
+    height: 240%;
+    bottom: -40%;
+    right: -30%;
+    background: radial-gradient(
+        ellipse at center,
+        var(--balto-glow-secondary) 0%,
+        var(--balto-glow-primary) 50%,
+        transparent 70%
+    );
 }
 
-/* Modify output state to work with gradient circles */
-.styledInput.output ~ .gradientCircleContainer {
-    opacity: 1;
-    animation: fade-out-circles 3s ease forwards 1s;
-}
-
-@keyframes fade-out-circles {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Output state - modified for gradient circles */
-.styledInput.output {
-    border: 1px solid transparent;
-    background: var(--balto-background-secondary);
-    transition: border 0.3s ease 3s;
-    box-shadow: none;
-    animation: restore-border 3s ease forwards 3s;
-}
-
-@keyframes restore-border {
-    0% {
-        border: 1px solid transparent;
-    }
-    100% {
-        border: 1px solid var(--balto-border-primary);
-    }
-}
-
-/* SVG outline container - optimized for performance */
+/* SVG outline container styles */
 .thinkingOutline {
     display: none;
     position: absolute;
@@ -159,7 +156,6 @@
     contain: layout paint style;
 }
 
-/* Animated gradient border for thinking state - optimized */
 .gradientPath {
     fill: none;
     stroke: url(#loading-gradient);
@@ -174,7 +170,6 @@
     transform: translateZ(0);
 }
 
-/* Base border for thinking state */
 .basePath {
     fill: none;
     stroke: var(--balto-gradient-primary-start);
@@ -184,7 +179,6 @@
     will-change: opacity, stroke-width;
 }
 
-/* Completed gradient border for output state */
 .outlinePath {
     fill: none;
     stroke: url(#completed-gradient);
@@ -196,76 +190,7 @@
     will-change: stroke-opacity, stroke-width;
 }
 
-/* Thinking state - show animated border */
-.thinkingOutline.thinking {
-    display: block;
-}
-
-.thinkingOutline.thinking .outlinePath {
-    display: none;
-}
-
-.thinkingOutline.thinking .basePath {
-    opacity: 1;
-    stroke-width: 6;
-    stroke: url(#completed-gradient);
-}
-
-.thinkingOutline.thinking .gradientPath {
-    stroke-width: 6;
-    animation: trace-outline 3s linear infinite;
-    opacity: 1;
-    transform: translateZ(0); /* Force GPU acceleration */
-}
-
-/* Output state - show completed border */
-.thinkingOutline.output {
-    display: block;
-}
-
-.thinkingOutline.output .outlinePath {
-    stroke: url(#completed-gradient);
-    stroke-dasharray: 0;
-    stroke-dashoffset: 0;
-    stroke-width: 6;
-    animation: fade-out-stroke 3s ease forwards;
-    transform: translateZ(0);
-}
-
-.thinkingOutline.output .basePath {
-    stroke-width: 6;
-    stroke: url(#completed-gradient);
-    opacity: 1;
-    animation: fade-out-stroke 3s ease forwards;
-}
-
-.thinkingOutline.output .gradientPath {
-    display: none;
-}
-
-@keyframes trace-outline {
-    0% {
-        stroke-dasharray: 92 1360;
-        stroke-dashoffset: 1360;
-    }
-    100% {
-        stroke-dasharray: 92 1360;
-        stroke-dashoffset: 0;
-    }
-}
-
-@keyframes fade-out-stroke {
-    0% {
-        stroke-opacity: 1;
-        stroke-width: 6;
-    }
-    100% {
-        stroke-opacity: 0;
-        stroke-width: 1;
-    }
-}
-
-/* Optimized shimmer effect */
+/* Shimmer container and elements */
 .skeletonContainer {
     position: absolute;
     top: 60px;
@@ -307,68 +232,87 @@
     animation: shimmer 3s linear infinite;
 }
 
-@keyframes shimmer {
-    from {
-        background-position: 0% 0;
-    }
-    to {
-        background-position: -200% 0;
-    }
+/* State-specific styles */
+/* Thinking state styles */
+.styledInput.thinking {
+    border: 1px solid transparent;
+    background: var(--balto-background-secondary);
+    will-change: border, opacity;
+    animation: none;
 }
 
-/* Add styles for the circular gradient containers */
-.gradientCircleContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    border-radius: 6px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 0;
+.styledInput.thinking ~ .gradientCircleContainer {
+    opacity: 1;
 }
 
-.gradientCircle {
-    position: absolute;
-    border-radius: 50%;
-    transform-origin: center;
-    will-change: transform;
-    opacity: 0.7;
-    filter: blur(40px);
-    /* Use translate3d for better GPU acceleration */
-    transform: translate3d(0, 0, 0);
+.styledInput.thinking ~ .gradientCircleContainer .gradientCircle.primary {
+    animation: rotate-slow-primary 16s linear infinite;
 }
 
-.gradientCircle.primary {
-    width: 280%;
-    height: 160%;
-    top: -30%;
-    left: -50%;
-    background: radial-gradient(
-        ellipse at center,
-        var(--balto-glow-primary) 0%,
-        var(--balto-glow-secondary) 50%,
-        transparent 70%
-    );
+.styledInput.thinking ~ .gradientCircleContainer .gradientCircle.secondary {
+    animation: rotate-slow-secondary 24s linear infinite;
 }
 
-.gradientCircle.secondary {
-    width: 180%;
-    height: 240%;
-    bottom: -40%;
-    right: -30%;
-    background: radial-gradient(
-        ellipse at center,
-        var(--balto-glow-secondary) 0%,
-        var(--balto-glow-primary) 50%,
-        transparent 70%
-    );
+.thinkingOutline.thinking {
+    display: block;
 }
 
-/* Animation for rotations */
+.thinkingOutline.thinking .outlinePath {
+    display: none;
+}
+
+.thinkingOutline.thinking .basePath {
+    opacity: 1;
+    stroke-width: 6;
+    stroke: url(#completed-gradient);
+}
+
+.thinkingOutline.thinking .gradientPath {
+    stroke-width: 6;
+    animation: trace-outline 3s linear infinite;
+    opacity: 1;
+    transform: translateZ(0);
+}
+
+/* Output state styles */
+.styledInput.output {
+    border: 1px solid transparent;
+    background: var(--balto-background-secondary);
+    transition: border 0.3s ease 3s;
+    box-shadow: none;
+    animation: restore-border 3s ease forwards 3s;
+}
+
+.styledInput.output ~ .gradientCircleContainer {
+    opacity: 1;
+    animation: fade-out-circles 3s ease forwards 1s;
+}
+
+.thinkingOutline.output {
+    display: block;
+}
+
+.thinkingOutline.output .outlinePath {
+    stroke: url(#completed-gradient);
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+    stroke-width: 6;
+    animation: fade-out-stroke 3s ease forwards;
+    transform: translateZ(0);
+}
+
+.thinkingOutline.output .basePath {
+    stroke-width: 6;
+    stroke: url(#completed-gradient);
+    opacity: 1;
+    animation: fade-out-stroke 3s ease forwards;
+}
+
+.thinkingOutline.output .gradientPath {
+    display: none;
+}
+
+/* Animation keyframes */
 @keyframes rotate-slow-primary {
     0% {
         transform: rotate(0deg) translate3d(0, 0, 0) scale(1);
@@ -405,7 +349,51 @@
     }
 }
 
-/* Update thinking state to work with both SVG and gradient circles */
-.thinkingOutline {
-    z-index: 1;
+@keyframes trace-outline {
+    0% {
+        stroke-dasharray: 92 1360;
+        stroke-dashoffset: 1360;
+    }
+    100% {
+        stroke-dasharray: 92 1360;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fade-out-stroke {
+    0% {
+        stroke-opacity: 1;
+        stroke-width: 6;
+    }
+    100% {
+        stroke-opacity: 0;
+        stroke-width: 1;
+    }
+}
+
+@keyframes fade-out-circles {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes restore-border {
+    0% {
+        border: 1px solid transparent;
+    }
+    100% {
+        border: 1px solid var(--balto-border-primary);
+    }
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 0% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
 } 
