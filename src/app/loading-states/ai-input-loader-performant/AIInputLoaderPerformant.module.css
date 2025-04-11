@@ -117,28 +117,28 @@
 }
 
 .gradientCircle.primary {
-    width: 280%;
-    height: 160%;
-    top: -60%;
+    width: 320%;
+    height: 320%;
+    top: -120%;
     left: -80%;
     background: radial-gradient(
         ellipse at center,
         var(--balto-glow-primary) 0%,
         var(--balto-glow-secondary) 50%,
-        transparent 70%
+        transparent 90%
     );
 }
 
 .gradientCircle.secondary {
-    width: 180%;
-    height: 240%;
+    width: 240%;
+    height: 280%;
     bottom: -40%;
-    right: -30%;
+    right: -20%;
     background: radial-gradient(
         ellipse at center,
         var(--balto-glow-secondary) 0%,
         var(--balto-glow-primary) 50%,
-        transparent 70%
+        transparent 90%
     );
 }
 
